@@ -10,11 +10,10 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 var camera, scene, renderer;
 var materials = {
-    grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: true }),
+    grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
     darkorange: new THREE.MeshBasicMaterial({ color: 0xfc6d00, wireframe: true }),
-    lightorange: new THREE.MeshBasicMaterial({ color: 0xfcc100, wireframe: true }),
+    lightorange: new THREE.MeshBasicMaterial({ color: 0xfcc100, wireframe: false }),
 };
-
 var geometry, material, mesh;
 
 /////////////////////
@@ -28,7 +27,7 @@ function createScene(){
     // Referencial Global - WCS
     scene.add(new THREE.AxesHelper(10));
 
-    createBase(0, 0, 0);
+    createCrane();
 
 }
 
@@ -62,35 +61,43 @@ function createCrane() {
     'use strict';
 
     createLowerCrane(0, 0, 0);
-    createUpperCrane(0, 10, 0);
-    
+
+    //createUpperCrane(crane, 0, 10, 0);
 }
 
 function createLowerCrane(x, y, z) {
     'use strict';
-}
 
-function createUpperCrane(x, y, z) {
-    'use strict';
-}
+    var lowerCrane = new THREE.Object3D();
 
-function createBase(x, y, z) {
-    'use strict';
-
-    var base = new THREE.Object3D();
+    addBase(lowerCrane, 0, 0, 0);
+    addTower(lowerCrane, 5, 15, 5);
     
-    material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+    scene.add(lowerCrane);
 
+    lowerCrane.position.x = x;
+    lowerCrane.position.y = y;
+    lowerCrane.position.z = z;
+}
+
+function addBase(obj, x, y, z) {
+    'use strict';
     geometry = new THREE.BoxGeometry(10, 5, 10);
-    mesh = new THREE.Mesh(geometry, material);
+    mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
-    base.add(mesh);
+    obj.add(mesh);
+}
 
-    scene.add(base);
+function addTower(obj, x, y, z) {
+    'use strict';
+    geometry = new THREE.BoxGeometry(5, 20, 5);
+    mesh = new THREE.Mesh(geometry, materials.lightorange);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
 
-    base.position.x = 0;
-    base.position.y = 0;
-    base.position.z = 0;
+function addUpperCrane(obj, x, y, z) {
+    'use strict';
 }
 
 //////////////////////
