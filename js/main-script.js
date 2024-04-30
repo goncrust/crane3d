@@ -8,7 +8,14 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 /* GLOBAL VARIABLES */
 //////////////////////
 
-var camera, scene, renderer, geometry, mesh;
+var lateral_camera,
+    top_camera,
+    frontal_camera,
+    claw_camera,
+    broad_p_camera,
+    broad_o_camera;
+
+var scene, renderer, geometry, mesh;
 var materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: true }),
     darkOrange: new THREE.MeshBasicMaterial({ color: 0xfc6d00, wireframe: true }),
@@ -68,87 +75,87 @@ function createCameras() {
 
 function createLateralCamera() {
     "use strict";
-    camera = new THREE.PerspectiveCamera(
+    lateral_camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
         1,
         1000,
     );
-    camera.position.x = 0;
-    camera.position.y = 50;
-    camera.position.z = 50;
-    camera.lookAt(0, 50, 0);
+    lateral_camera.position.x = 0;
+    lateral_camera.position.y = 50;
+    lateral_camera.position.z = 50;
+    lateral_camera.lookAt(0, 50, 0);
 }
 
 function createFrontalCamera() {
     "use strict";
-    camera = new THREE.PerspectiveCamera(
+    frontal_camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
         1,
         1000,
     );
-    camera.position.x = 100;
-    camera.position.y = 50;
-    camera.position.z = 0;
-    camera.lookAt(0, 50, 0);
+    frontal_camera.position.x = 100;
+    frontal_camera.position.y = 50;
+    frontal_camera.position.z = 0;
+    frontal_camera.lookAt(0, 50, 0);
 }
 
 function createTopCamera() {
     "use strict";
-    camera = new THREE.PerspectiveCamera(
+    top_camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
         1,
         1000,
     );
-    camera.position.x = 0;
-    camera.position.y = 100;
-    camera.position.z = 0;
-    camera.lookAt(0, 0, 0);
+    top_camera.position.x = 0;
+    top_camera.position.y = 100;
+    top_camera.position.z = 0;
+    top_camera.lookAt(0, 0, 0);
 }
 
 function createClawCamera() {
     "use strict";
-    camera = new THREE.PerspectiveCamera(
+    claw_camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
         1,
         1000,
     );
     // TODO
-    camera.position.x = 50;
-    camera.position.y = 50;
-    camera.position.z = 50;
-    camera.lookAt(scene.position);
+    claw_camera.position.x = 50;
+    claw_camera.position.y = 50;
+    claw_camera.position.z = 50;
+    claw_camera.lookAt(scene.position);
 }
 
 function createBroadPerpectiveCamera() {
     "use strict";
-    camera = new THREE.PerspectiveCamera(
+    broad_p_camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
         1,
         1000,
     );
-    camera.position.x = 75;
-    camera.position.y = 75;
-    camera.position.z = 75;
-    camera.lookat(0, 50, 0);
+    broad_p_camera.position.x = 75;
+    broad_p_camera.position.y = 75;
+    broad_p_camera.position.z = 75;
+    broad_p_camera.lookat(0, 50, 0);
 }
 
 function createBroadOrthographicCamera() {
     "use strict";
-    camera = new THREE.PerspectiveCamera(
+    broad_o_camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
         1,
         1000,
     );
-    camera.position.x = 75;
-    camera.position.y = 75;
-    camera.position.z = 75;
-    camera.lookat(0, 50, 0);
+    broad_o_camera.position.x = 75;
+    broad_o_camera.position.y = 75;
+    broad_o_camera.position.z = 75;
+    broad_o_camera.lookat(0, 50, 0);
 }
 
 /////////////////////
@@ -228,7 +235,7 @@ function update() {
 /////////////
 function render() {
     "use strict";
-    renderer.render(scene, camera);
+    renderer.render(scene, lateral_camera);
 }
 
 ////////////////////////////////
