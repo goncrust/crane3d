@@ -8,7 +8,22 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 /* GLOBAL VARIABLES */
 //////////////////////
 
-var camera, scene, renderer;
+var camera, scene, renderer, geometry, mesh;
+var materials = {
+    grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: true }),
+    darkorange: new THREE.MeshBasicMaterial({
+        color: 0xfc6d00,
+        wireframe: true,
+    }),
+    lightorange: new THREE.MeshBasicMaterial({
+        color: 0xfcc100,
+        wireframe: true,
+    }),
+    lightblue: new THREE.MeshBasicMaterial({
+        color: 0x85e6fc,
+        wireframe: true,
+    }),
+};
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -18,7 +33,10 @@ function createScene() {
 
     scene = new THREE.Scene();
 
-    scene.add(new THREE.AxesHelper(1));
+    // Referencial Global - WCS
+    scene.add(new THREE.AxesHelper(10));
+
+    createBase(0, 0, 0);
 }
 
 //////////////////////
@@ -125,6 +143,43 @@ function createBroadOrthographicCamera() {
 ////////////////////////
 /* CREATE OBJECT3D(S) */
 ////////////////////////
+
+function createCrane() {
+    "use strict";
+
+    createLowerCrane(0, 0, 0);
+    createUpperCrane(0, 10, 0);
+}
+
+function createLowerCrane(x, y, z) {
+    "use strict";
+}
+
+function createUpperCrane(x, y, z) {
+    "use strict";
+}
+
+function createBase(x, y, z) {
+    "use strict";
+
+    var base = new THREE.Object3D();
+
+    material = new THREE.MeshBasicMaterial({
+        color: 0x00ff00,
+        wireframe: true,
+    });
+
+    geometry = new THREE.BoxGeometry(10, 5, 10);
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    base.add(mesh);
+
+    scene.add(base);
+
+    base.position.x = 0;
+    base.position.y = 0;
+    base.position.z = 0;
+}
 
 //////////////////////
 /* CHECK COLLISIONS */
