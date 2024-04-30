@@ -18,18 +18,31 @@ var lateral_camera,
 var scene, renderer, geometry, mesh;
 var materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: true }),
-    darkorange: new THREE.MeshBasicMaterial({
-        color: 0xfc6d00,
-        wireframe: true,
-    }),
-    lightorange: new THREE.MeshBasicMaterial({
-        color: 0xfcc100,
-        wireframe: true,
-    }),
-    lightblue: new THREE.MeshBasicMaterial({
-        color: 0x85e6fc,
-        wireframe: true,
-    }),
+    darkOrange: new THREE.MeshBasicMaterial({ color: 0xfc6d00, wireframe: true }),
+    lightOrange: new THREE.MeshBasicMaterial({ color: 0xfcc100, wireframe: true }),
+    lightBlue: new THREE.MeshBasicMaterial({ color: 0x85e6fc, wireframe: true }),
+};
+var dimensions = {
+    hBase,
+    lBase,
+    hTower,
+    lTower,
+    lCab,
+    hCounterWeight,
+    cCounterWeight,
+    hCounterJib,
+    cCounterJib,
+    hJib,
+    cJib,
+    hDifference,
+    hInferiorTowerPeak,
+    hSuperiorTowerPeak,
+    hTrolley,
+    cTrolley,
+    lClawBase,
+    hClawBase,
+    lClaw,
+    hClaw,
 };
 
 /////////////////////
