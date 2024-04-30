@@ -9,6 +9,11 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 //////////////////////
 
 var camera, scene, renderer;
+var materials = {
+    grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: true }),
+    darkorange: new THREE.MeshBasicMaterial({ color: 0xfc6d00, wireframe: true }),
+    lightorange: new THREE.MeshBasicMaterial({ color: 0xfcc100, wireframe: true }),
+};
 
 var geometry, material, mesh;
 
@@ -149,7 +154,7 @@ function animate() {
 ////////////////////////////
 /* RESIZE WINDOW CALLBACK */
 ////////////////////////////
-function onResize() { 
+function onResize() {
     'use strict';
 
 }
