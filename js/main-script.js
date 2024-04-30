@@ -8,14 +8,13 @@ import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 /* GLOBAL VARIABLES */
 //////////////////////
 
-var camera, scene, renderer;
+var camera, scene, renderer, geometry, mesh;
 var materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: true }),
     darkorange: new THREE.MeshBasicMaterial({ color: 0xfc6d00, wireframe: true }),
     lightorange: new THREE.MeshBasicMaterial({ color: 0xfcc100, wireframe: true }),
+    lightblue: new THREE.MeshBasicMaterial({ color: 0x85e6fc, wireframe: true }),
 };
-
-var geometry, material, mesh;
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -63,7 +62,7 @@ function createCrane() {
 
     createLowerCrane(0, 0, 0);
     createUpperCrane(0, 10, 0);
-    
+
 }
 
 function createLowerCrane(x, y, z) {
@@ -78,7 +77,7 @@ function createBase(x, y, z) {
     'use strict';
 
     var base = new THREE.Object3D();
-    
+
     material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
 
     geometry = new THREE.BoxGeometry(10, 5, 10);
