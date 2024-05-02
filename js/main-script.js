@@ -89,9 +89,7 @@ function createLateralCamera() {
         1,
         1000,
     );
-    lateral_camera.position.x = 0;
-    lateral_camera.position.y = 75;
-    lateral_camera.position.z = 50;
+    lateral_camera.position.set(0, 50, 130);
     lateral_camera.lookAt(0, 50, 0);
 }
 
@@ -103,9 +101,7 @@ function createFrontalCamera() {
         1,
         1000,
     );
-    frontal_camera.position.x = 100;
-    frontal_camera.position.y = 50;
-    frontal_camera.position.z = 0;
+    frontal_camera.position.set(100, 50, 0);
     frontal_camera.lookAt(0, 50, 0);
 }
 
@@ -117,9 +113,7 @@ function createTopCamera() {
         1,
         1000,
     );
-    top_camera.position.x = 0;
-    top_camera.position.y = 100;
-    top_camera.position.z = 0;
+    top_camera.position.set(0, 100, 0);
     top_camera.lookAt(0, 0, 0);
 }
 
@@ -132,9 +126,7 @@ function createClawCamera() {
         1000,
     );
     // TODO
-    claw_camera.position.x = 50;
-    claw_camera.position.y = 50;
-    claw_camera.position.z = 50;
+    claw_camera.position.set(50, 50, 50);
     claw_camera.lookAt(scene.position);
 }
 
@@ -146,9 +138,7 @@ function createBroadPerpectiveCamera() {
         1,
         1000,
     );
-    broad_p_camera.position.x = 75;
-    broad_p_camera.position.y = 75;
-    broad_p_camera.position.z = 75;
+    broad_p_camera.position.set(75, 75, 75);
     broad_p_camera.lookAt(0, 50, 0);
 }
 
@@ -160,9 +150,7 @@ function createBroadOrthographicCamera() {
         1,
         1000,
     );
-    broad_o_camera.position.x = 75;
-    broad_o_camera.position.y = 75;
-    broad_o_camera.position.z = 75;
+    broad_o_camera.position.set(75, 75, 75);
     broad_o_camera.lookAt(0, 50, 0);
 }
 
