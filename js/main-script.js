@@ -50,8 +50,8 @@ var dimensions = {
     hJib: 0,
     cJib: 30,
     hDifference: 0,
-    hInferiorTowerPeak: 0,
-    hSuperiorTowerPeak: 0,
+    hInferiorTowerPeak: 20,
+    hSuperiorTowerPeak: 10,
     hTrolley: 0,
     cTrolley: 0,
     lClawBase: 0,
@@ -70,7 +70,7 @@ function createScene() {
     scene = new THREE.Scene();
 
     // Referencial Global - WCS
-    scene.add(new THREE.AxesHelper(10));
+    //scene.add(new THREE.AxesHelper(10));
 
     createCrane();
 }
@@ -168,7 +168,7 @@ function createCrane() {
     "use strict";
 
     createLowerCrane(0, 0, 0);
-    createUpperCrane(0, 10, 0);
+    createUpperCrane(0, dimensions.hBase+dimensions.hTower, 0);
     //createCar
     //createClaw
 }
@@ -219,11 +219,11 @@ function createUpperCrane(x, y, z) {
 
     var upperCrane = new THREE.Object3D();
 
-    // ref_wcs = ref_base
+    // Referencial Filho: Eixo Rotatório
     upperCrane.add(new THREE.AxesHelper(5));
 
     addSuperiorTowerPeak(upperCrane, dimensions.lTower, dimensions.hSuperiorTowerPeak, dimensions.lTower);
-    //addInferiorTowerPeak(upperCrane, dimensions.lTower, dimensions.hInferiorTowerPeak, dimensions.lTower);
+    addInferiorTowerPeak(upperCrane, 0, dimensions.hInferiorTowerPeak/2, 0);
     addJib(upperCrane, x + (dimensions.cJib + dimensions.lTower) / 2, y, z);
     //addTurntable(upperCrane, x, y, z);
     //addCab(upperCrane, x, y, z);
@@ -240,8 +240,8 @@ function createUpperCrane(x, y, z) {
 
 function addSuperiorTowerPeak(obj, x, y, z) {
     'use strict';
-    geometry = new THREE.ConeGeometry(1, 5, 10);
-    mesh = new THREE.Mesh(geometry, materials.grey);
+    geometry = new THREE.ConeGeometry(dimensions.lTower * 3/4, dimensions.hSuperiorTowerPeak, 4).rotateY(4);
+    mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
@@ -249,6 +249,13 @@ function addSuperiorTowerPeak(obj, x, y, z) {
 function addJib(obj, x, y, z) {
     'use strict';
     geometry = new THREE.BoxGeometry(dimensions.cJib, dimensions.lTower, dimensions.lTower);
+    mesh = new THREE.Mesh(geometry, materials.darkOrange);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+function addInferiorTowerPeak(obj, x, y, z) {
+    'use strict';
+    geometry = new THREE.BoxGeometry(dimensions.lTower, dimensions.hInferiorTowerPeak, dimensions.lTower);
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
     obj.add(mesh);
