@@ -57,8 +57,6 @@ function createScene() {
     scene.add(new THREE.AxesHelper(10));
 
     createCrane();
-
-    createBase(0, 0, 0);
 }
 
 //////////////////////
