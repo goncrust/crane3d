@@ -90,7 +90,7 @@ function createLateralCamera() {
         1000,
     );
     lateral_camera.position.x = 0;
-    lateral_camera.position.y = 50;
+    lateral_camera.position.y = 75;
     lateral_camera.position.z = 50;
     lateral_camera.lookAt(0, 50, 0);
 }
@@ -264,7 +264,7 @@ function init() {
     createScene();
     createCameras();
 
-    curr_camera = broad_p_camera;
+    curr_camera = lateral_camera;
 
     bindEvents();
     render();
