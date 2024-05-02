@@ -182,8 +182,8 @@ function createLowerCrane(x, y, z) {
 
     var lowerCrane = new THREE.Object3D();
 
-    addBase(lowerCrane, 0, 0, 0);
-    addTower(lowerCrane, 5, 15, 5);
+    addBase(lowerCrane, 0, dimensions.hBase / 2, 0);
+    addTower(lowerCrane, 0, dimensions.hTower / 2 + dimensions.hBase, 0);
 
     scene.add(lowerCrane);
 
