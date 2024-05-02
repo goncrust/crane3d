@@ -23,8 +23,8 @@ var materials = {
     lightBlue: new THREE.MeshBasicMaterial({ color: 0x85e6fc, wireframe: true }),
 };
 var dimensions = {
-    hBase,
-    lBase,
+    hBase: 10,
+    lBase: 5,
     hTower,
     lTower,
     lCab,
@@ -180,21 +180,14 @@ function createBase(x, y, z) {
 
     var base = new THREE.Object3D();
 
-    material = new THREE.MeshBasicMaterial({
-        color: 0x00ff00,
-        wireframe: true,
-    });
-
-    geometry = new THREE.BoxGeometry(10, 5, 10);
+    material = materials.grey;
+    geometry = new THREE.BoxGeometry(dimensions.lBase, dimensions.hBase, dimensions.lBase);
     mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z);
     base.add(mesh);
 
-    scene.add(base);
+    base.position.set(x, y, z);
 
-    base.position.x = 0;
-    base.position.y = 0;
-    base.position.z = 0;
+    scene.add(base);
 }
 
 //////////////////////
