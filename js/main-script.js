@@ -23,26 +23,26 @@ var materials = {
     lightBlue: new THREE.MeshBasicMaterial({ color: 0x85e6fc, wireframe: true }),
 };
 var dimensions = {
-    hBase: 10,
-    lBase: 5,
-    hTower,
-    lTower,
-    lCab,
-    hCounterWeight,
-    cCounterWeight,
-    hCounterJib,
-    cCounterJib,
-    hJib,
-    cJib,
-    hDifference,
-    hInferiorTowerPeak,
-    hSuperiorTowerPeak,
-    hTrolley,
-    cTrolley,
-    lClawBase,
-    hClawBase,
-    lClaw,
-    hClaw,
+    hBase: 5,
+    lBase: 10,
+    hTower: 20,
+    lTower: 5,
+    lCab: 0,
+    hCounterWeight: 0,
+    cCounterWeight: 0,
+    hCounterJib: 0,
+    cCounterJib: 0,
+    hJib: 0,
+    cJib: 0,
+    hDifference: 0,
+    hInferiorTowerPeak: 0,
+    hSuperiorTowerPeak: 0,
+    hTrolley: 0,
+    cTrolley: 0,
+    lClawBase: 0,
+    hClawBase: 0,
+    lClaw: 0,
+    hClaw: 0,
 };
 
 /////////////////////
@@ -139,7 +139,7 @@ function createBroadPerpectiveCamera() {
     broad_p_camera.position.x = 75;
     broad_p_camera.position.y = 75;
     broad_p_camera.position.z = 75;
-    broad_p_camera.lookat(0, 50, 0);
+    broad_p_camera.lookAt(0, 50, 0);
 }
 
 function createBroadOrthographicCamera() {
@@ -153,7 +153,7 @@ function createBroadOrthographicCamera() {
     broad_o_camera.position.x = 75;
     broad_o_camera.position.y = 75;
     broad_o_camera.position.z = 75;
-    broad_o_camera.lookat(0, 50, 0);
+    broad_o_camera.lookAt(0, 50, 0);
 }
 
 ////////////////////////
@@ -175,7 +175,7 @@ function createLowerCrane(x, y, z) {
 
     addBase(lowerCrane, 0, 0, 0);
     addTower(lowerCrane, 5, 15, 5);
-    
+
     scene.add(lowerCrane);
 
     lowerCrane.position.x = x;
@@ -185,7 +185,7 @@ function createLowerCrane(x, y, z) {
 
 function addBase(obj, x, y, z) {
     'use strict';
-    geometry = new THREE.BoxGeometry(10, 5, 10);
+    geometry = new THREE.BoxGeometry(dimensions.lBase, dimensions.hBase, dimensions.lBase);
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -193,8 +193,8 @@ function addBase(obj, x, y, z) {
 
 function addTower(obj, x, y, z) {
     'use strict';
-    geometry = new THREE.BoxGeometry(5, 20, 5);
-    mesh = new THREE.Mesh(geometry, materials.lightorange);
+    geometry = new THREE.BoxGeometry(dimensions.lTower, dimensions.hTower, dimensions.lTower);
+    mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
@@ -229,7 +229,7 @@ function update() {
 /////////////
 function render() {
     "use strict";
-    renderer.render(scene, lateral_camera);
+    renderer.render(scene, broad_p_camera);
 }
 
 ////////////////////////////////
