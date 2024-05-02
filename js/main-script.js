@@ -8,8 +8,12 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 /* GLOBAL VARIABLES */
 //////////////////////
 
-var curr_camera,
-    lateral_camera,
+var ref_wcs,
+    ref_rotation,
+    ref_car,
+    ref_claw;
+
+var lateral_camera,
     top_camera,
     frontal_camera,
     claw_camera,
@@ -54,6 +58,7 @@ var dimensions = {
     lClaw: 0,
     hClaw: 0,
 };
+
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -174,14 +179,17 @@ function createCrane() {
     "use strict";
 
     createLowerCrane(0, 0, 0);
-
-    //createUpperCrane(crane, 0, 10, 0);
+    createUpperCrane(0, 10, 0);
+    //createCar
+    //createClaw
 }
 
 function createLowerCrane(x, y, z) {
     "use strict";
 
     var lowerCrane = new THREE.Object3D();
+
+    lowerCrane.add(new THREE.AxesHelper(5));
 
     addBase(lowerCrane, 0, dimensions.hBase / 2, 0);
     addTower(lowerCrane, 0, dimensions.hTower / 2 + dimensions.hBase, 0);
@@ -217,9 +225,39 @@ function addTower(obj, x, y, z) {
     obj.add(mesh);
 }
 
-function addUpperCrane(obj, x, y, z) {
-    "use strict";
+function createUpperCrane(x, y, z) {
+    'use strict';
+
+    var upperCrane = new THREE.Object3D();
+
+    // ref_wcs = ref_base
+    upperCrane.add(new THREE.AxesHelper(5));
+
+    addSuperiorTowerPeak(upperCrane, lTower, hSuperiorTowerPeak, lTower);
+    addInferiorTowerPeak(upperCrane, lTower, hInferiorTowerPeak, lTower);
+    //addTurntable(upperCrane, x, y, z);
+    //addCab(upperCrane, x, y, z);
+    //addCounterjib(upperCrane, x, y, z);
+    //addCounterWeight(upperCrane, x, y, z);
+    //addJib(upperCrane, x, y, z);
+    
+    scene.add(upperCrane);
+
+    upperCrane.position.x = x;
+    upperCrane.position.y = y;
+    upperCrane.position.z = z;
+    
 }
+
+function addSuperiorTowerPeak(obj, x, y, z) {
+    'use strict';
+    geometry = new THREE.ConeGeometry(1 , 5, 10);
+    mesh = new THREE.Mesh(geomcreateUpperCraneetry, materials.grey);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+
 
 //////////////////////
 /* CHECK COLLISIONS */
