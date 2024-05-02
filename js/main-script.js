@@ -18,9 +18,18 @@ var lateral_camera,
 var scene, renderer, geometry, mesh;
 var materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: true }),
-    darkOrange: new THREE.MeshBasicMaterial({ color: 0xfc6d00, wireframe: true }),
-    lightOrange: new THREE.MeshBasicMaterial({ color: 0xfcc100, wireframe: true }),
-    lightBlue: new THREE.MeshBasicMaterial({ color: 0x85e6fc, wireframe: true }),
+    darkOrange: new THREE.MeshBasicMaterial({
+        color: 0xfc6d00,
+        wireframe: true,
+    }),
+    lightOrange: new THREE.MeshBasicMaterial({
+        color: 0xfcc100,
+        wireframe: true,
+    }),
+    lightBlue: new THREE.MeshBasicMaterial({
+        color: 0x85e6fc,
+        wireframe: true,
+    }),
 };
 var dimensions = {
     hBase,
@@ -240,6 +249,7 @@ function init() {
     createScene();
     createCameras();
 
+    bindEvents();
     render();
 }
 
@@ -251,10 +261,25 @@ function animate() {
 }
 
 ////////////////////////////
+/*        EVENTS          */
+////////////////////////////
+function bindEvents() {
+    window.addEventListener("resize", onResize);
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+}
+
+////////////////////////////
 /* RESIZE WINDOW CALLBACK */
 ////////////////////////////
 function onResize() {
     "use strict";
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    if (window.innerHeight > 0 && window.innerWidth > 0) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    }
 }
 
 ///////////////////////
