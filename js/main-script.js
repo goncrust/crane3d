@@ -13,7 +13,8 @@ var ref_wcs,
     ref_car,
     ref_claw;
 
-var lateral_camera,
+var curr_camera,
+    lateral_camera,
     top_camera,
     frontal_camera,
     claw_camera,
@@ -239,7 +240,7 @@ function createUpperCrane(x, y, z) {
 
 function addSuperiorTowerPeak(obj, x, y, z) {
     'use strict';
-    geometry = new THREE.ConeGeometry(1 , 5, 10);
+    geometry = new THREE.ConeGeometry(1, 5, 10);
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -290,7 +291,7 @@ function init() {
     createScene();
     createCameras();
 
-    curr_camera = lateral_camera;
+    curr_camera = broad_p_camera;
 
     bindEvents();
     render();
