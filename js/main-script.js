@@ -23,8 +23,8 @@ var materials = {
     lightBlue: new THREE.MeshBasicMaterial({ color: 0x85e6fc, wireframe: true }),
 };
 var dimensions = {
-    hBase,
-    lBase,
+    hBase: 10,
+    lBase: 5,
     hTower,
     lTower,
     lCab,
@@ -155,10 +155,6 @@ function createBroadOrthographicCamera() {
     broad_o_camera.position.z = 75;
     broad_o_camera.lookat(0, 50, 0);
 }
-
-/////////////////////
-/* CREATE LIGHT(S) */
-/////////////////////
 
 ////////////////////////
 /* CREATE OBJECT3D(S) */
