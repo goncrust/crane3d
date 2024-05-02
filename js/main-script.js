@@ -156,10 +156,6 @@ function createBroadOrthographicCamera() {
     broad_o_camera.lookat(0, 50, 0);
 }
 
-/////////////////////
-/* CREATE LIGHT(S) */
-/////////////////////
-
 ////////////////////////
 /* CREATE OBJECT3D(S) */
 ////////////////////////
