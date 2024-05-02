@@ -8,7 +8,8 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 /* GLOBAL VARIABLES */
 //////////////////////
 
-var lateral_camera,
+var curr_camera,
+    lateral_camera,
     top_camera,
     frontal_camera,
     claw_camera,
@@ -178,13 +179,13 @@ function createCrane() {
 }
 
 function createLowerCrane(x, y, z) {
-    'use strict';
+    "use strict";
 
     var lowerCrane = new THREE.Object3D();
 
     addBase(lowerCrane, 0, 0, 0);
     addTower(lowerCrane, 5, 15, 5);
-    
+
     scene.add(lowerCrane);
 
     lowerCrane.position.x = x;
@@ -193,7 +194,7 @@ function createLowerCrane(x, y, z) {
 }
 
 function addBase(obj, x, y, z) {
-    'use strict';
+    "use strict";
     geometry = new THREE.BoxGeometry(10, 5, 10);
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -201,7 +202,7 @@ function addBase(obj, x, y, z) {
 }
 
 function addTower(obj, x, y, z) {
-    'use strict';
+    "use strict";
     geometry = new THREE.BoxGeometry(5, 20, 5);
     mesh = new THREE.Mesh(geometry, materials.lightorange);
     mesh.position.set(x, y, z);
@@ -209,7 +210,7 @@ function addTower(obj, x, y, z) {
 }
 
 function addUpperCrane(obj, x, y, z) {
-    'use strict';
+    "use strict";
 }
 
 //////////////////////
@@ -238,7 +239,7 @@ function update() {
 /////////////
 function render() {
     "use strict";
-    renderer.render(scene, lateral_camera);
+    renderer.render(scene, curr_camera);
 }
 
 ////////////////////////////////
@@ -254,6 +255,8 @@ function init() {
 
     createScene();
     createCameras();
+
+    curr_camera = broad_p_camera;
 
     bindEvents();
     render();
@@ -283,8 +286,8 @@ function onResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     if (window.innerHeight > 0 && window.innerWidth > 0) {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+        curr_camera.aspect = window.innerWidth / window.innerHeight;
+        curr_camera.updateProjectionMatrix();
     }
 }
 
