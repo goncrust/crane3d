@@ -233,26 +233,26 @@ function createUpperCrane(x, y, z) {
     // ref_wcs = ref_base
     upperCrane.add(new THREE.AxesHelper(5));
 
-    addSuperiorTowerPeak(upperCrane, lTower, hSuperiorTowerPeak, lTower);
-    addInferiorTowerPeak(upperCrane, lTower, hInferiorTowerPeak, lTower);
+    addSuperiorTowerPeak(upperCrane, dimensions.lTower, dimensions.hSuperiorTowerPeak, dimensions.lTower);
+    //addInferiorTowerPeak(upperCrane, dimensions.lTower, dimensions.hInferiorTowerPeak, dimensions.lTower);
     //addTurntable(upperCrane, x, y, z);
     //addCab(upperCrane, x, y, z);
     //addCounterjib(upperCrane, x, y, z);
     //addCounterWeight(upperCrane, x, y, z);
     //addJib(upperCrane, x, y, z);
-    
+
     scene.add(upperCrane);
 
     upperCrane.position.x = x;
     upperCrane.position.y = y;
     upperCrane.position.z = z;
-    
+
 }
 
 function addSuperiorTowerPeak(obj, x, y, z) {
     'use strict';
     geometry = new THREE.ConeGeometry(1 , 5, 10);
-    mesh = new THREE.Mesh(geomcreateUpperCraneetry, materials.grey);
+    mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
