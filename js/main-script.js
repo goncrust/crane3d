@@ -48,7 +48,7 @@ var dimensions = {
     hCounterJib: 0,
     cCounterJib: 0,
     hJib: 0,
-    cJib: 0,
+    cJib: 30,
     hDifference: 0,
     hInferiorTowerPeak: 0,
     hSuperiorTowerPeak: 0,
@@ -224,11 +224,11 @@ function createUpperCrane(x, y, z) {
 
     addSuperiorTowerPeak(upperCrane, dimensions.lTower, dimensions.hSuperiorTowerPeak, dimensions.lTower);
     //addInferiorTowerPeak(upperCrane, dimensions.lTower, dimensions.hInferiorTowerPeak, dimensions.lTower);
+    addJib(upperCrane, x + (dimensions.cJib + dimensions.lTower) / 2, y, z);
     //addTurntable(upperCrane, x, y, z);
     //addCab(upperCrane, x, y, z);
     //addCounterjib(upperCrane, x, y, z);
     //addCounterWeight(upperCrane, x, y, z);
-    //addJib(upperCrane, x, y, z);
 
     scene.add(upperCrane);
 
@@ -246,7 +246,13 @@ function addSuperiorTowerPeak(obj, x, y, z) {
     obj.add(mesh);
 }
 
-
+function addJib(obj, x, y, z) {
+    'use strict';
+    geometry = new THREE.BoxGeometry(dimensions.cJib, dimensions.lTower, dimensions.lTower);
+    mesh = new THREE.Mesh(geometry, materials.darkOrange);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
 
 //////////////////////
 /* CHECK COLLISIONS */
