@@ -18,7 +18,7 @@ let curr_camera,
 
 let scene, renderer, geometry, mesh;
 
-let lowerCrane, upperCrane, trolley;
+let crane, lowerCrane, upperCrane, trolley;
 
 let materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
@@ -170,7 +170,11 @@ function createCrane() {
     let height_upperTower = dimensions.hBase + dimensions.hTower;
     let height_trolley = dimensions.hDifference;
 
+    crane = new THREE.Object3D();
+
     createLowerCrane(0, 0, 0);
+    crane.add(lowerCrane);
+
     createUpperCrane(0, height_upperTower, 0);
     lowerCrane.add(upperCrane);
 
@@ -179,6 +183,8 @@ function createCrane() {
 
     createClaw(0, -(dimensions.hTrolley + dimensions.hClawBase), 0);
     trolley.add(claw);
+
+    scene.add(crane);
 }
 
 function createLowerCrane(x, y, z) {
@@ -191,11 +197,8 @@ function createLowerCrane(x, y, z) {
     addBase(lowerCrane, 0, dimensions.hBase / 2, 0);
     addTower(lowerCrane, 0, dimensions.hTower / 2 + dimensions.hBase, 0);
 
-    scene.add(lowerCrane);
 
-    lowerCrane.position.x = x;
-    lowerCrane.position.y = y;
-    lowerCrane.position.z = z;
+    lowerCrane.position.set(x, y, z);
 }
 
 function addBase(obj, x, y, z) {
@@ -262,11 +265,8 @@ function createUpperCrane(x, y, z) {
 
     //addTurntable(upperCrane, x, y, z);
 
-    scene.add(upperCrane);
 
-    upperCrane.position.x = x;
-    upperCrane.position.y = y;
-    upperCrane.position.z = z;
+    upperCrane.position.set(x, y, z);
 
     upperCrane.rotateY(0);
 }
@@ -353,11 +353,8 @@ function createTrolleyObject(x, y, z) {
     addTrolley(trolley, 0, -dimensions.hTrolley / 2, 0);
     //addClawBase(trolley, 0, maxClawHeight, 0);
 
-    scene.add(trolley);
 
-    trolley.position.x = x;
-    trolley.position.y = y;
-    trolley.position.z = z;
+    trolley.position.set(x, y, z);
 }
 
 function addTrolley(obj, x, y, z) {
@@ -383,11 +380,8 @@ function createClaw(x, y, z) {
     // Posições relativas ao novo referencial
     addClawBase(claw, 0, dimensions.hClawBase / 2, 0);
 
-    scene.add(claw);
 
-    claw.position.x = x;
-    claw.position.y = y;
-    claw.position.z = z;
+    claw.position.set(x, y, z);
 }
 
 function addClawBase(obj, x, y, z) {
