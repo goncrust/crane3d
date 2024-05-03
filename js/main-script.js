@@ -19,6 +19,7 @@ var curr_camera,
     broad_o_camera;
 
 var scene, renderer, geometry, mesh;
+var lowerCrane, upperCrane;
 var materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
     darkOrange: new THREE.MeshBasicMaterial({
@@ -171,7 +172,7 @@ function createCrane() {
 function createLowerCrane(x, y, z) {
     "use strict";
 
-    var lowerCrane = new THREE.Object3D();
+    lowerCrane = new THREE.Object3D();
 
     lowerCrane.add(new THREE.AxesHelper(10));
 
@@ -211,9 +212,9 @@ function addTower(obj, x, y, z) {
 
 function createUpperCrane(x, y, z) {
     "use strict";
-    var hJib = dimensions.hDifference+dimensions.hJib/2;
+    var hJib = dimensions.hDifference + dimensions.hJib / 2;
 
-    var upperCrane = new THREE.Object3D();
+    upperCrane = new THREE.Object3D();
 
     // Referencial Filho: Eixo Rotatório
     upperCrane.add(new THREE.AxesHelper(10));
@@ -221,39 +222,30 @@ function createUpperCrane(x, y, z) {
     // Posições relativas ao novo referencial
     addSuperiorTowerPeak(
         upperCrane,
-        0, 
-        dimensions.hInferiorTowerPeak+dimensions.hSuperiorTowerPeak/2, 
-        0
+        0,
+        dimensions.hInferiorTowerPeak + dimensions.hSuperiorTowerPeak / 2,
+        0,
     );
-    addInferiorTowerPeak(
-        upperCrane, 
-        0, 
-        dimensions.hInferiorTowerPeak / 2, 
-        0
-    );
-    addJib(
-        upperCrane, 
-        (dimensions.lTower+dimensions.cJib) / 2, 
-        hJib, 
-        0
-    );
+    addInferiorTowerPeak(upperCrane, 0, dimensions.hInferiorTowerPeak / 2, 0);
+    addJib(upperCrane, (dimensions.lTower + dimensions.cJib) / 2, hJib, 0);
     addCounterJib(
-        upperCrane, 
-        (-dimensions.lTower-dimensions.cCounterJib)/2, 
-        hJib, 
-        0
+        upperCrane,
+        (-dimensions.lTower - dimensions.cCounterJib) / 2,
+        hJib,
+        0,
     );
     addCounterWeight(
-        upperCrane, 
-        (dimensions.cCounterWeight - dimensions.lTower)/2 - dimensions.cCounterJib, 
+        upperCrane,
+        (dimensions.cCounterWeight - dimensions.lTower) / 2 -
+            dimensions.cCounterJib,
         hJib - dimensions.hJib,
-        0
+        0,
     );
     addCab(
-        upperCrane, 
-        0, 
-        dimensions.hDifference/2, 
-        (dimensions.lTower+dimensions.lCab)/2
+        upperCrane,
+        0,
+        dimensions.hDifference / 2,
+        (dimensions.lTower + dimensions.lCab) / 2,
     );
 
     //addTurntable(upperCrane, x, y, z);
@@ -441,6 +433,20 @@ function onKeyDown(e) {
             break;
         case 54: //6
             curr_camera = claw_camera;
+            break;
+        case 81: //q
+            upperCrane.rotateY(0.1);
+            break;
+        case 65: //a
+            upperCrane.rotateY(-0.1);
+            break;
+        case 87: //w
+            break;
+        case 83: //s
+            break;
+        case 69: //e
+            break;
+        case 68: //d
             break;
     }
 }
