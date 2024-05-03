@@ -20,18 +20,18 @@ var curr_camera,
 
 var scene, renderer, geometry, mesh;
 var materials = {
-    grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
+    grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: true }),
     darkOrange: new THREE.MeshBasicMaterial({
         color: 0xfc6d00,
-        wireframe: false,
+        wireframe: true,
     }),
     lightOrange: new THREE.MeshBasicMaterial({
         color: 0xfcc100,
-        wireframe: false,
+        wireframe: true,
     }),
     lightBlue: new THREE.MeshBasicMaterial({
         color: 0x85e6fc,
-        wireframe: false,
+        wireframe: true,
     }),
 };
 var dimensions = {
@@ -40,13 +40,13 @@ var dimensions = {
     hTower: 20,
     lTower: 5,
     lCab: 0,
-    hCounterWeight: 0,
-    cCounterWeight: 0,
+    hCounterWeight: 5,
+    cCounterWeight: 10,
     hCounterJib: 0,
-    cCounterJib: 0,
-    hJib: 0,
+    cCounterJib: 15,
+    hJib: 5,
     cJib: 30,
-    hDifference: 0,
+    hDifference: 10,
     hInferiorTowerPeak: 20,
     hSuperiorTowerPeak: 10,
     hTrolley: 0,
@@ -218,18 +218,40 @@ function createUpperCrane(x, y, z) {
     // Referencial Filho: Eixo Rotatório
     upperCrane.add(new THREE.AxesHelper(5));
 
+    // Posições relativas ao novo referencial
     addSuperiorTowerPeak(
         upperCrane,
-        dimensions.lTower,
-        dimensions.hSuperiorTowerPeak,
-        dimensions.lTower,
+        0, 
+        dimensions.hInferiorTowerPeak+dimensions.hSuperiorTowerPeak/2, 
+        0
     );
-    addInferiorTowerPeak(upperCrane, 0, dimensions.hInferiorTowerPeak / 2, 0);
-    addJib(upperCrane, x + (dimensions.cJib + dimensions.lTower) / 2, y, z);
+    addInferiorTowerPeak(
+        upperCrane, 
+        0, 
+        dimensions.hInferiorTowerPeak / 2, 
+        0
+    );
+    addJib(
+        upperCrane, 
+        (dimensions.lTower+dimensions.cJib) / 2, 
+        dimensions.hInferiorTowerPeak - (dimensions.hJib / 2), 
+        0
+    );
+    addCounterJib(
+        upperCrane, 
+        (-dimensions.lTower-dimensions.cCounterJib)/2, 
+        dimensions.hInferiorTowerPeak - (dimensions.hJib / 2), 
+        0
+    );
+    addCounterWeight(
+        upperCrane, 
+        (dimensions.cCounterWeight - dimensions.lTower)/2 - dimensions.cCounterJib, 
+        dimensions.hInferiorTowerPeak - (dimensions.hJib * 3/2),
+        0
+    );
+
     //addTurntable(upperCrane, x, y, z);
     //addCab(upperCrane, x, y, z);
-    //addCounterjib(upperCrane, x, y, z);
-    //addCounterWeight(upperCrane, x, y, z);
 
     scene.add(upperCrane);
 
@@ -249,18 +271,6 @@ function addSuperiorTowerPeak(obj, x, y, z) {
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
-
-function addJib(obj, x, y, z) {
-    "use strict";
-    geometry = new THREE.BoxGeometry(
-        dimensions.cJib,
-        dimensions.lTower,
-        dimensions.lTower,
-    );
-    mesh = new THREE.Mesh(geometry, materials.darkOrange);
-    mesh.position.set(x, y, z);
-    obj.add(mesh);
-}
 function addInferiorTowerPeak(obj, x, y, z) {
     "use strict";
     geometry = new THREE.BoxGeometry(
@@ -269,6 +279,42 @@ function addInferiorTowerPeak(obj, x, y, z) {
         dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function addJib(obj, x, y, z) {
+    "use strict";
+    geometry = new THREE.BoxGeometry(
+        dimensions.cJib,
+        dimensions.hJib,
+        dimensions.lTower,
+    );
+    mesh = new THREE.Mesh(geometry, materials.darkOrange);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function addCounterJib(obj, x, y, z) {
+    "use strict";
+    geometry = new THREE.BoxGeometry(
+        dimensions.cCounterJib,
+        dimensions.hJib,
+        dimensions.lTower,
+    );
+    mesh = new THREE.Mesh(geometry, materials.darkOrange);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function addCounterWeight(obj, x, y, z) {
+    "use strict";
+    geometry = new THREE.BoxGeometry(
+        dimensions.cCounterWeight,
+        dimensions.hCounterWeight,
+        dimensions.lTower,
+    );
+    mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
