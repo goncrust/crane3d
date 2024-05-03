@@ -36,6 +36,8 @@ let materials = {
     }),
 };
 
+const BASE_H_ROPE = 5;
+
 let dimensions = {
     hBase: 5,
     lBase: 10,
@@ -57,7 +59,7 @@ let dimensions = {
     lClaw: 0,
     hClaw: 0,
     rRope: 0.5,
-    hRope: 5,
+    hRope: BASE_H_ROPE,
 };
 
 let pressedKeys = {
@@ -74,7 +76,17 @@ let pressedKeys = {
     'd': false,
 };
 
-let maxClawHeight = -(dimensions.hTrolley + dimensions.hClawBase);
+const MAX_TROLLEY_X = dimensions.cJib + dimensions.lTower / 2 - dimensions.cTrolley / 2;
+const MIN_TROLLEY_X = dimensions.lTower / 2 + dimensions.cTrolley / 2;
+
+const MIN_ROPE_SCALE = 0;
+const MAX_ROPE_SCALE = (dimensions.hTower + dimensions.hDifference - dimensions.hTrolley) / BASE_H_ROPE;
+
+const Y_AXIS = new THREE.Vector3(0, 1, 0);
+const MIN_TOWER_ANGLE = 0;
+const MAX_TOWER_ANGLE = Math.PI;
+
+let ropeScale, trolleyX, towerAngle;
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -202,6 +214,10 @@ function createCrane() {
     let heightUpperTower = dimensions.hBase + dimensions.hTower;
     let heightTrolley = dimensions.hDifference;
 
+    ropeScale = 1;
+    trolleyX = dimensions.cJib / 2;
+    towerAngle = 0;
+
     crane = new THREE.Object3D();
 
     createLowerCrane(0, 0, 0);
@@ -210,10 +226,10 @@ function createCrane() {
     createUpperCrane(0, heightUpperTower, 0);
     lowerCrane.add(upperCrane);
 
-    createTrolley(dimensions.cJib / 2, heightTrolley, 0);
+    createTrolley(trolleyX, heightTrolley, 0);
     upperCrane.add(trolley);
 
-    // createClaw(0, -(dimensions.hTrolley + dimensions.hClawBase), 0);
+    // createClaw(0, -(dimensions.hTrolley + dimensions.hRope), 0);
     // trolley.add(claw);
 
     scene.add(crane);
@@ -382,8 +398,8 @@ function createTrolley(x, y, z) {
 
     // Posições relativas ao novo referencial
     addTrolley(trolley, 0, -dimensions.hTrolley / 2, 0);
-    addClawBase(trolley, 0, -(dimensions.hRope + dimensions.hClawBase/2), 0);
-    addRope(trolley, 0, - dimensions.hRope / 2, 0);
+    addRope(trolley, 0, -(dimensions.hTrolley + dimensions.hRope / 2), 0);
+    addClawBase(trolley, 0, -(dimensions.hTrolley + dimensions.hRope + dimensions.hClawBase / 2), 0);
 
     trolley.position.set(x, y, z);
 }
@@ -430,9 +446,10 @@ function createClaw(x, y, z) {
     "use strict";
 
     claw = new THREE.Object3D();
-
-    // Referencial Neto: Carrinho
+    // Referencial Bisneto: Pinças da garra
     claw.add(new THREE.AxesHelper(10));
+
+    // Posições relativas ao novo referencial
 
     claw.position.set(x, y, z);
 }
@@ -456,6 +473,21 @@ function handleCollisions() {
 ////////////
 function update() {
     "use strict";
+    trolleyX = Math.min(trolleyX, MAX_TROLLEY_X);
+    trolleyX = Math.max(trolleyX, MIN_TROLLEY_X);
+    trolley.position.x = trolleyX;
+
+    towerAngle = Math.min(towerAngle, MAX_TOWER_ANGLE);
+    towerAngle = Math.max(towerAngle, MIN_TOWER_ANGLE);
+    upperCrane.setRotationFromAxisAngle(Y_AXIS, towerAngle);
+
+    ropeScale = Math.min(ropeScale, MAX_ROPE_SCALE);
+    ropeScale = Math.max(ropeScale, MIN_ROPE_SCALE);
+    dimensions.hRope = BASE_H_ROPE * ropeScale;
+    let rope = trolley.getObjectByName('rope');
+    rope.scale.y = ropeScale;
+    rope.position.y = -(dimensions.hTrolley + dimensions.hRope / 2);
+    trolley.getObjectByName('clawBase').position.y = -(dimensions.hTrolley + dimensions.hRope + dimensions.hClawBase / 2);
 }
 
 /////////////
@@ -531,7 +563,7 @@ function onKeyDown(e) {
         if (pressedKeys[key]) {
             switch (key) {
                 case '1':
-                    currCamera = frontal_camera;
+                    currCamera = frontalCamera;
                     for (let material in materials) {
                         materials[material].wireframe = !materials[material].wireframe;
                     }
@@ -552,51 +584,23 @@ function onKeyDown(e) {
                     currCamera = clawCamera;
                     break;
                 case 'q':
-                    upperCrane.rotateY(0.1);
+                    towerAngle += 0.1;
                     break;
                 case 'a':
-                    upperCrane.rotateY(-0.1);
+                    towerAngle -= 0.1;
                     break;
                 case 'w':
-                    let max_x =
-                        dimensions.cJib +
-                        dimensions.lTower / 2 -
-                        dimensions.cTrolley / 2;
-                    if (trolley.position.x < max_x)
-                        trolley.position.x = Math.min(trolley.position.x + 1, max_x);
+                    trolleyX += 1;
                     break;
                 case 's':
-                    let min_x = dimensions.lTower / 2 + dimensions.cTrolley / 2;
-                    if (trolley.position.x > min_x)
-                        trolley.position.x = Math.max(trolley.position.x - 1, min_x);
+                    trolleyX -= 1;
                     break;
                 case 'e':
-                    for (let child of trolley.children) {
-                        if (child.name === 'rope') {
-                            child.scale.y += 0.2;
-                            dimensions.hRope = child.geometry.parameters.height * child.scale.y;
-                            child.position.y = -dimensions.hRope / 2;
-                        }
-                    }
-                    for (let child of trolley.children) {
-                        if (child.name === 'clawBase') {
-                            child.position.y = -(dimensions.hRope + dimensions.hClawBase/2);
-                        }
-                    }
+                    console.log(trolley);
+                    ropeScale += 0.2;
                     break;
                 case 'd':
-                    for (let child of trolley.children) {
-                        if (child.name === 'rope') {
-                            child.scale.y -= 0.2;
-                            dimensions.hRope = child.geometry.parameters.height * child.scale.y;
-                            child.position.y = -dimensions.hRope / 2;
-                        }
-                    }
-                    for (let child of trolley.children) {
-                        if (child.name === 'clawBase') {
-                            child.position.y = -(dimensions.hRope + dimensions.hClawBase/2);
-                        }
-                    }
+                    ropeScale -= 0.2;
                     break;
             }
         }
