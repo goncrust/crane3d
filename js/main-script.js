@@ -173,7 +173,7 @@ function createCrane() {
     createLowerCrane(0, 0, 0);
     createUpperCrane(0, height_upperTower, 0);
     lowerCrane.add(upperCrane);
-    
+
     createTrolleyObject(dimensions.cJib / 2, height_trolley, 0);
     upperCrane.add(trolley);
 
