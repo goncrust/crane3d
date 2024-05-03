@@ -164,8 +164,8 @@ function createBroadOrthographicCamera() {
 function createCrane() {
     "use strict";
 
-    var height_upperTower = dimensions.hBase + dimensions.hTower;
-    var ref_trolley = height_upperTower + dimensions.hDifference;
+    let height_upperTower = dimensions.hBase + dimensions.hTower;
+    let ref_trolley = height_upperTower + dimensions.hDifference;
 
     createLowerCrane(0, 0, 0);
     createUpperCrane(0, height_upperTower, 0);
@@ -216,7 +216,7 @@ function addTower(obj, x, y, z) {
 
 function createUpperCrane(x, y, z) {
     "use strict";
-    var hJib = dimensions.hDifference + dimensions.hJib / 2;
+    let hJib = dimensions.hDifference + dimensions.hJib / 2;
 
     upperCrane = new THREE.Object3D();
 
@@ -451,7 +451,7 @@ function onKeyDown(e) {
     switch (e.keyCode) {
         case 49: //1
             curr_camera = frontal_camera;
-            for (var material in materials) {
+            for (let material in materials) {
                 materials[material].wireframe = !materials[material].wireframe;
             }
             break;
