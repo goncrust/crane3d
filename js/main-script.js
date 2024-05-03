@@ -18,7 +18,7 @@ let curr_camera,
 
 let scene, renderer, geometry, mesh;
 
-let crane, lowerCrane, upperCrane, trolley;
+let crane, lowerCrane, upperCrane, trolley, claw;
 
 let materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
@@ -56,10 +56,25 @@ let dimensions = {
     hClawBase: 2,
     lClaw: 0,
     hClaw: 0,
+    rRope: 0.5,
+    hRope: 5,
+};
+
+let pressedKeys = {
+    '1': false,
+    '2': false,
+    '3': false,
+    '4': false,
+    '5': false,
+    'q': false,
+    'a': false,
+    'w': false,
+    's': false,
+    'e': false,
+    'd': false,
 };
 
 let maxClawHeight = -(dimensions.hTrolley + dimensions.hClawBase);
-let claw;
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -178,11 +193,11 @@ function createCrane() {
     createUpperCrane(0, height_upperTower, 0);
     lowerCrane.add(upperCrane);
 
-    createTrolleyObject(dimensions.cJib / 2, height_trolley, 0);
+    createTrolley(dimensions.cJib / 2, height_trolley, 0);
     upperCrane.add(trolley);
 
-    createClaw(0, -(dimensions.hTrolley + dimensions.hClawBase), 0);
-    trolley.add(claw);
+    // createClaw(0, -(dimensions.hTrolley + dimensions.hClawBase), 0);
+    // trolley.add(claw);
 
     scene.add(crane);
 }
@@ -282,6 +297,7 @@ function addSuperiorTowerPeak(obj, x, y, z) {
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
+
 function addInferiorTowerPeak(obj, x, y, z) {
     "use strict";
     geometry = new THREE.BoxGeometry(
@@ -342,7 +358,7 @@ function addCab(obj, x, y, z) {
     obj.add(mesh);
 }
 
-function createTrolleyObject(x, y, z) {
+function createTrolley(x, y, z) {
     "use strict";
 
     trolley = new THREE.Object3D();
@@ -351,8 +367,8 @@ function createTrolleyObject(x, y, z) {
 
     // Posições relativas ao novo referencial
     addTrolley(trolley, 0, -dimensions.hTrolley / 2, 0);
-    //addClawBase(trolley, 0, maxClawHeight, 0);
-
+    addClawBase(trolley, 0, -(dimensions.hRope + dimensions.hClawBase/2), 0);
+    addRope(trolley, 0, - dimensions.hRope / 2, 0);
 
     trolley.position.set(x, y, z);
 }
@@ -369,19 +385,17 @@ function addTrolley(obj, x, y, z) {
     obj.add(mesh);
 }
 
-function createClaw(x, y, z) {
+function addRope(obj, x, y, z) {
     "use strict";
-
-    claw = new THREE.Object3D();
-
-    // Referencial Neto: Carrinho
-    claw.add(new THREE.AxesHelper(10));
-
-    // Posições relativas ao novo referencial
-    addClawBase(claw, 0, dimensions.hClawBase / 2, 0);
-
-
-    claw.position.set(x, y, z);
+    geometry = new THREE.CylinderGeometry(
+        dimensions.rRope,
+        dimensions.rRope,
+        dimensions.hRope,
+    );
+    mesh = new THREE.Mesh(geometry, materials.grey);
+    mesh.position.set(x, y, z);
+    mesh.name = 'rope';
+    obj.add(mesh);
 }
 
 function addClawBase(obj, x, y, z) {
@@ -393,7 +407,19 @@ function addClawBase(obj, x, y, z) {
     );
     mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
+    mesh.name = 'clawBase';
     obj.add(mesh);
+}
+
+function createClaw(x, y, z) {
+    "use strict";
+
+    claw = new THREE.Object3D();
+
+    // Referencial Neto: Carrinho
+    claw.add(new THREE.AxesHelper(10));
+
+    claw.position.set(x, y, z);
 }
 
 //////////////////////
@@ -480,56 +506,85 @@ function onResize() {
 function onKeyDown(e) {
     "use strict";
 
-    switch (e.keyCode) {
-        case 49: //1
-            curr_camera = frontal_camera;
-            for (let material in materials) {
-                materials[material].wireframe = !materials[material].wireframe;
+    if (!pressedKeys.hasOwnProperty(e.key)) {
+        return;
+    }
+
+    pressedKeys[e.key] = true;
+
+    for (const key in pressedKeys) {
+        if (pressedKeys[key]) {
+            switch (key) {
+                case '1':
+                    curr_camera = frontal_camera;
+                    for (let material in materials) {
+                        materials[material].wireframe = !materials[material].wireframe;
+                    }
+                    break;
+                case '2':
+                    curr_camera = lateral_camera;
+                    break;
+                case '3':
+                    curr_camera = top_camera;
+                    break;
+                case '4':
+                    curr_camera = broad_o_camera;
+                    break;
+                case '5':
+                    curr_camera = broad_p_camera;
+                    break;
+                case '6':
+                    curr_camera = claw_camera;
+                    break;
+                case 'q':
+                    upperCrane.rotateY(0.1);
+                    break;
+                case 'a':
+                    upperCrane.rotateY(-0.1);
+                    break;
+                case 'w':
+                    let max_x =
+                        dimensions.cJib +
+                        dimensions.lTower / 2 -
+                        dimensions.cTrolley / 2;
+                    if (trolley.position.x < max_x)
+                        trolley.position.x = Math.min(trolley.position.x + 1, max_x);
+                    break;
+                case 's':
+                    let min_x = dimensions.lTower / 2 + dimensions.cTrolley / 2;
+                    if (trolley.position.x > min_x)
+                        trolley.position.x = Math.max(trolley.position.x - 1, min_x);
+                    break;
+                case 'e':
+                    for (let child of trolley.children) {
+                        if (child.name === 'rope') {
+                            child.scale.y += 0.2;
+                            dimensions.hRope = child.geometry.parameters.height * child.scale.y;
+                            child.position.y = -dimensions.hRope / 2;
+                        }
+                    }
+                    for (let child of trolley.children) {
+                        if (child.name === 'clawBase') {
+                            child.position.y = -(dimensions.hRope + dimensions.hClawBase/2);
+                        }
+                    }
+                    break;
+                case 'd':
+                    for (let child of trolley.children) {
+                        if (child.name === 'rope') {
+                            child.scale.y -= 0.2;
+                            dimensions.hRope = child.geometry.parameters.height * child.scale.y;
+                            child.position.y = -dimensions.hRope / 2;
+                        }
+                    }
+                    for (let child of trolley.children) {
+                        if (child.name === 'clawBase') {
+                            child.position.y = -(dimensions.hRope + dimensions.hClawBase/2);
+                        }
+                    }
+                    break;
             }
-            break;
-        case 50: //2
-            curr_camera = lateral_camera;
-            break;
-        case 51: //3
-            curr_camera = top_camera;
-            break;
-        case 52: //4
-            curr_camera = broad_o_camera;
-            break;
-        case 53: //5
-            curr_camera = broad_p_camera;
-            break;
-        case 54: //6
-            curr_camera = claw_camera;
-            break;
-        case 81: //q
-            upperCrane.rotateY(0.1);
-            break;
-        case 65: //a
-            upperCrane.rotateY(-0.1);
-            break;
-        case 87: //w
-            let max_x =
-                dimensions.cJib +
-                dimensions.lTower / 2 -
-                dimensions.cTrolley / 2;
-            if (trolley.position.x < max_x)
-                trolley.position.x = Math.min(trolley.position.x + 1, max_x);
-            break;
-        case 83: //s
-            let min_x = dimensions.lTower / 2 + dimensions.cTrolley / 2;
-            if (trolley.position.x > min_x)
-                trolley.position.x = Math.max(trolley.position.x - 1, min_x);
-            break;
-        case 69: //e
-            if (claw.position.y < maxClawHeight)
-                claw.position.y = Math.min(claw.position.y + 1, maxClawHeight);
-            break;
-        case 68: //d
-            let minClawHeight = maxClawHeight - dimensions.hTower;
-            if (claw.position.y > minClawHeight)
-                claw.position.y = Math.max(claw.position.y - 1, minClawHeight);
-            break;
+        }
     }
 }
 
@@ -538,6 +593,10 @@ function onKeyDown(e) {
 ///////////////////////
 function onKeyUp(e) {
     "use strict";
+    if (!pressedKeys.hasOwnProperty(e.key)) {
+        return;
+    }
+    pressedKeys[e.key] = false;
 }
 
 init();
