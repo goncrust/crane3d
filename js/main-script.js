@@ -8,10 +8,7 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 /* GLOBAL VARIABLES */
 //////////////////////
 
-var ref_wcs,
-    ref_rotation,
-    ref_car,
-    ref_claw;
+var ref_wcs, ref_rotation, ref_car, ref_claw;
 
 var curr_camera,
     lateral_camera,
@@ -23,18 +20,18 @@ var curr_camera,
 
 var scene, renderer, geometry, mesh;
 var materials = {
-    grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: true }),
+    grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
     darkOrange: new THREE.MeshBasicMaterial({
         color: 0xfc6d00,
-        wireframe: true,
+        wireframe: false,
     }),
     lightOrange: new THREE.MeshBasicMaterial({
         color: 0xfcc100,
-        wireframe: true,
+        wireframe: false,
     }),
     lightBlue: new THREE.MeshBasicMaterial({
         color: 0x85e6fc,
-        wireframe: true,
+        wireframe: false,
     }),
 };
 var dimensions = {
@@ -59,7 +56,6 @@ var dimensions = {
     lClaw: 0,
     hClaw: 0,
 };
-
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -168,7 +164,7 @@ function createCrane() {
     "use strict";
 
     createLowerCrane(0, 0, 0);
-    createUpperCrane(0, dimensions.hBase+dimensions.hTower, 0);
+    createUpperCrane(0, dimensions.hBase + dimensions.hTower, 0);
     //createCar
     //createClaw
 }
@@ -215,15 +211,20 @@ function addTower(obj, x, y, z) {
 }
 
 function createUpperCrane(x, y, z) {
-    'use strict';
+    "use strict";
 
     var upperCrane = new THREE.Object3D();
 
     // Referencial Filho: Eixo Rotatório
     upperCrane.add(new THREE.AxesHelper(5));
 
-    addSuperiorTowerPeak(upperCrane, dimensions.lTower, dimensions.hSuperiorTowerPeak, dimensions.lTower);
-    addInferiorTowerPeak(upperCrane, 0, dimensions.hInferiorTowerPeak/2, 0);
+    addSuperiorTowerPeak(
+        upperCrane,
+        dimensions.lTower,
+        dimensions.hSuperiorTowerPeak,
+        dimensions.lTower,
+    );
+    addInferiorTowerPeak(upperCrane, 0, dimensions.hInferiorTowerPeak / 2, 0);
     addJib(upperCrane, x + (dimensions.cJib + dimensions.lTower) / 2, y, z);
     //addTurntable(upperCrane, x, y, z);
     //addCab(upperCrane, x, y, z);
@@ -235,27 +236,38 @@ function createUpperCrane(x, y, z) {
     upperCrane.position.x = x;
     upperCrane.position.y = y;
     upperCrane.position.z = z;
-
 }
 
 function addSuperiorTowerPeak(obj, x, y, z) {
-    'use strict';
-    geometry = new THREE.ConeGeometry(dimensions.lTower * 3/4, dimensions.hSuperiorTowerPeak, 4).rotateY(4);
+    "use strict";
+    geometry = new THREE.ConeGeometry(
+        (dimensions.lTower * 3) / 4,
+        dimensions.hSuperiorTowerPeak,
+        4,
+    ).rotateY(4);
     mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
 
 function addJib(obj, x, y, z) {
-    'use strict';
-    geometry = new THREE.BoxGeometry(dimensions.cJib, dimensions.lTower, dimensions.lTower);
+    "use strict";
+    geometry = new THREE.BoxGeometry(
+        dimensions.cJib,
+        dimensions.lTower,
+        dimensions.lTower,
+    );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
 function addInferiorTowerPeak(obj, x, y, z) {
-    'use strict';
-    geometry = new THREE.BoxGeometry(dimensions.lTower, dimensions.hInferiorTowerPeak, dimensions.lTower);
+    "use strict";
+    geometry = new THREE.BoxGeometry(
+        dimensions.lTower,
+        dimensions.hInferiorTowerPeak,
+        dimensions.lTower,
+    );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -344,6 +356,32 @@ function onResize() {
 ///////////////////////
 function onKeyDown(e) {
     "use strict";
+
+    switch (e.keycode) {
+        case 49: //1
+            curr_camera = frontal_camera;
+            scene.traverse(function (node) {
+                if (node instanceof THREE.Mesh) {
+                    node.material.wireframe = !node.material.wireframe;
+                }
+            });
+            break;
+        case 50: //2
+            curr_camera = lateral_camera;
+            break;
+        case 51: //3
+            curr_camera = top_camera;
+            break;
+        case 52: //4
+            curr_camera = broad_o_camera;
+            break;
+        case 53: //5
+            curr_camera = broad_p_camera;
+            break;
+        case 54: //6
+            curr_camera = claw_camera;
+            break;
+    }
 }
 
 ///////////////////////
