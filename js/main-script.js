@@ -314,11 +314,9 @@ function init() {
     document.body.appendChild(renderer.domElement);
 
     createScene();
-
+    bindEvents();
     createCameras();
     curr_camera = broad_p_camera;
-
-    bindEvents();
 }
 
 /////////////////////
@@ -326,6 +324,7 @@ function init() {
 /////////////////////
 function animate() {
     "use strict";
+    update();
     render();
     requestAnimationFrame(animate);
 }
