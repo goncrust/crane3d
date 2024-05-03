@@ -52,11 +52,14 @@ let dimensions = {
     hSuperiorTowerPeak: 5,
     hTrolley: 3,
     cTrolley: 6,
-    lClawBase: 0,
-    hClawBase: 0,
+    lClawBase: 3,
+    hClawBase: 2,
     lClaw: 0,
     hClaw: 0,
 };
+
+let maxClawHeight = -(dimensions.hTrolley+dimensions.hClawBase);
+let claw;
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -165,12 +168,17 @@ function createCrane() {
     "use strict";
 
     let height_upperTower = dimensions.hBase + dimensions.hTower;
-    let ref_trolley = height_upperTower + dimensions.hDifference;
+    let height_trolley = dimensions.hDifference;
 
     createLowerCrane(0, 0, 0);
     createUpperCrane(0, height_upperTower, 0);
-    createTrolleyObject(dimensions.cJib / 2, ref_trolley, 0);
-    //createClaw
+    lowerCrane.add(upperCrane);
+    
+    createTrolleyObject(dimensions.cJib / 2, height_trolley, 0);
+    upperCrane.add(trolley);
+
+    createClaw(0, -(dimensions.hTrolley+dimensions.hClawBase), 0);
+    trolley.add(claw);
 }
 
 function createLowerCrane(x, y, z) {
@@ -338,12 +346,12 @@ function createTrolleyObject(x, y, z) {
     "use strict";
 
     trolley = new THREE.Object3D();
-
     // Referencial Neto: Carrinho
     trolley.add(new THREE.AxesHelper(10));
 
     // Posições relativas ao novo referencial
     addTrolley(trolley, 0, -dimensions.hTrolley / 2, 0);
+    //addClawBase(trolley, 0, maxClawHeight, 0);
 
     scene.add(trolley);
 
@@ -360,6 +368,36 @@ function addTrolley(obj, x, y, z) {
         dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function createClaw(x, y, z) {
+    "use strict";
+
+    claw = new THREE.Object3D();
+
+    // Referencial Neto: Carrinho
+    claw.add(new THREE.AxesHelper(10));
+
+    // Posições relativas ao novo referencial
+    addClawBase(claw, 0, dimensions.hClawBase/2, 0);
+
+    scene.add(claw);
+
+    claw.position.x = x;
+    claw.position.y = y;
+    claw.position.z = z;
+}
+
+function addClawBase(obj, x, y, z) {
+    "use strict";
+    geometry = new THREE.BoxGeometry(
+        dimensions.lClawBase,
+        dimensions.hClawBase,
+        dimensions.lClawBase,
+    );
+    mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
@@ -490,8 +528,13 @@ function onKeyDown(e) {
                 trolley.position.x = Math.max(trolley.position.x - 1, min_x);
             break;
         case 69: //e
+            if (claw.position.y < maxClawHeight)
+                claw.position.y = Math.min(claw.position.y + 1, maxClawHeight);
             break;
         case 68: //d
+            let minClawHeight = maxClawHeight - dimensions.hTower;
+            if (claw.position.y > minClawHeight)
+                claw.position.y = Math.max(claw.position.y - 1, minClawHeight);
             break;
     }
 }
