@@ -361,11 +361,9 @@ function onKeyDown(e) {
     switch (e.keyCode) {
         case 49: //1
             curr_camera = frontal_camera;
-            scene.traverse(function (node) {
-                if (node instanceof THREE.Mesh) {
-                    node.material.wireframe = !node.material.wireframe;
-                }
-            });
+            for (var material in materials) {
+                materials[material].wireframe = !materials[material].wireframe;
+            }
             break;
         case 50: //2
             curr_camera = lateral_camera;
