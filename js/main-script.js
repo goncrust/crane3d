@@ -8,13 +8,13 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 /* GLOBAL VARIABLES */
 //////////////////////
 
-let curr_camera,
-    lateral_camera,
-    top_camera,
-    frontal_camera,
-    claw_camera,
-    broad_p_camera,
-    broad_o_camera;
+let currCamera,
+    lateralCamera,
+    topCamera,
+    frontalCamera,
+    clawCamera,
+    broadPCamera,
+    broadOCamera;
 
 let scene, renderer, geometry, mesh;
 
@@ -92,7 +92,7 @@ function createLateralCamera() {
     "use strict";
     let aspectRatio = window.innerWidth / window.innerHeight;
     let viewSize = 70;
-    lateral_camera = new THREE.OrthographicCamera(
+    lateralCamera = new THREE.OrthographicCamera(
         (aspectRatio * viewSize) / -2,
         (aspectRatio * viewSize) / 2,
         viewSize / 2,
@@ -100,15 +100,15 @@ function createLateralCamera() {
         1,
         1000,
     );
-    lateral_camera.position.set(0, 30, 70);
-    lateral_camera.lookAt(0, 30, 0);
+    lateralCamera.position.set(0, 30, 70);
+    lateralCamera.lookAt(0, 30, 0);
 }
 
 function createFrontalCamera() {
     "use strict";
     let aspectRatio = window.innerWidth / window.innerHeight;
     let viewSize = 70;
-    frontal_camera = new THREE.OrthographicCamera(
+    frontalCamera = new THREE.OrthographicCamera(
         (aspectRatio * viewSize) / -2,
         (aspectRatio * viewSize) / 2,
         viewSize / 2,
@@ -116,15 +116,15 @@ function createFrontalCamera() {
         1,
         1000,
     );
-    frontal_camera.position.set(100, 30, 0);
-    frontal_camera.lookAt(0, 30, 0);
+    frontalCamera.position.set(100, 30, 0);
+    frontalCamera.lookAt(0, 30, 0);
 }
 
 function createTopCamera() {
     "use strict";
     let aspectRatio = window.innerWidth / window.innerHeight;
     let viewSize = 70;
-    top_camera = new THREE.OrthographicCamera(
+    topCamera = new THREE.OrthographicCamera(
         (aspectRatio * viewSize) / -2,
         (aspectRatio * viewSize) / 2,
         viewSize / 2,
@@ -132,40 +132,40 @@ function createTopCamera() {
         1,
         1000,
     );
-    top_camera.position.set(0, 70, 0);
-    top_camera.lookAt(0, 0, 0);
+    topCamera.position.set(0, 70, 0);
+    topCamera.lookAt(0, 0, 0);
 }
 
 function createClawCamera() {
     "use strict";
-    claw_camera = new THREE.PerspectiveCamera(
+    clawCamera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
         1,
         1000,
     );
     // TODO
-    claw_camera.position.set(50, 50, 50);
-    claw_camera.lookAt(scene.position);
+    clawCamera.position.set(50, 50, 50);
+    clawCamera.lookAt(scene.position);
 }
 
 function createBroadPerpectiveCamera() {
     "use strict";
-    broad_p_camera = new THREE.PerspectiveCamera(
+    broadPCamera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
         1,
         1000,
     );
-    broad_p_camera.position.set(40, 40, 40);
-    broad_p_camera.lookAt(0, 25, 0);
+    broadPCamera.position.set(40, 40, 40);
+    broadPCamera.lookAt(0, 25, 0);
 }
 
 function createBroadOrthographicCamera() {
     "use strict";
     let aspectRatio = window.innerWidth / window.innerHeight;
     let viewSize = 70;
-    broad_o_camera = new THREE.OrthographicCamera(
+    broadOCamera = new THREE.OrthographicCamera(
         (aspectRatio * viewSize) / -2,
         (aspectRatio * viewSize) / 2,
         viewSize / 2,
@@ -173,8 +173,8 @@ function createBroadOrthographicCamera() {
         1,
         1000,
     );
-    broad_o_camera.position.set(40, 40, 40);
-    broad_o_camera.lookAt(0, 25, 0);
+    broadOCamera.position.set(40, 40, 40);
+    broadOCamera.lookAt(0, 25, 0);
 }
 
 ////////////////////////
@@ -184,18 +184,18 @@ function createBroadOrthographicCamera() {
 function createCrane() {
     "use strict";
 
-    let height_upperTower = dimensions.hBase + dimensions.hTower;
-    let height_trolley = dimensions.hDifference;
+    let heightUpperTower = dimensions.hBase + dimensions.hTower;
+    let heightTrolley = dimensions.hDifference;
 
     crane = new THREE.Object3D();
 
     createLowerCrane(0, 0, 0);
     crane.add(lowerCrane);
 
-    createUpperCrane(0, height_upperTower, 0);
+    createUpperCrane(0, heightUpperTower, 0);
     lowerCrane.add(upperCrane);
 
-    createTrolleyObject(dimensions.cJib / 2, height_trolley, 0);
+    createTrolleyObject(dimensions.cJib / 2, heightTrolley, 0);
     upperCrane.add(trolley);
 
     createClaw(0, -(dimensions.hTrolley + dimensions.hClawBase), 0);
@@ -435,7 +435,7 @@ function update() {
 /////////////
 function render() {
     "use strict";
-    renderer.render(scene, curr_camera);
+    renderer.render(scene, currCamera);
 }
 
 ////////////////////////////////
@@ -452,7 +452,7 @@ function init() {
     createScene();
     bindEvents();
     createCameras();
-    curr_camera = broad_p_camera;
+    currCamera = broadPCamera;
 }
 
 /////////////////////
@@ -482,8 +482,8 @@ function onResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     if (window.innerHeight > 0 && window.innerWidth > 0) {
-        curr_camera.aspect = window.innerWidth / window.innerHeight;
-        curr_camera.updateProjectionMatrix();
+        currCamera.aspect = window.innerWidth / window.innerHeight;
+        currCamera.updateProjectionMatrix();
     }
 }
 
@@ -495,25 +495,25 @@ function onKeyDown(e) {
 
     switch (e.keyCode) {
         case 49: //1
-            curr_camera = frontal_camera;
+            currCamera = frontalCamera;
             for (let material in materials) {
                 materials[material].wireframe = !materials[material].wireframe;
             }
             break;
         case 50: //2
-            curr_camera = lateral_camera;
+            currCamera = lateralCamera;
             break;
         case 51: //3
-            curr_camera = top_camera;
+            currCamera = topCamera;
             break;
         case 52: //4
-            curr_camera = broad_o_camera;
+            currCamera = broadOCamera;
             break;
         case 53: //5
-            curr_camera = broad_p_camera;
+            currCamera = broadPCamera;
             break;
         case 54: //6
-            curr_camera = claw_camera;
+            currCamera = clawCamera;
             break;
         case 81: //q
             upperCrane.rotateY(0.1);
