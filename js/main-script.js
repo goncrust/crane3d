@@ -68,6 +68,7 @@ function createScene() {
     "use strict";
 
     scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x9fe2bf);
 
     // Referencial Global - WCS
     //scene.add(new THREE.AxesHelper(10));
@@ -97,7 +98,7 @@ function createLateralCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000
+        1000,
     );
     lateral_camera.position.set(0, 30, 70);
     lateral_camera.lookAt(0, 30, 0);
@@ -113,7 +114,7 @@ function createFrontalCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000
+        1000,
     );
     frontal_camera.position.set(100, 30, 0);
     frontal_camera.lookAt(0, 30, 0);
@@ -129,7 +130,7 @@ function createTopCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000
+        1000,
     );
     top_camera.position.set(0, 70, 0);
     top_camera.lookAt(0, 0, 0);
@@ -141,7 +142,7 @@ function createClawCamera() {
         70,
         window.innerWidth / window.innerHeight,
         1,
-        1000
+        1000,
     );
     // TODO
     claw_camera.position.set(50, 50, 50);
@@ -154,7 +155,7 @@ function createBroadPerpectiveCamera() {
         70,
         window.innerWidth / window.innerHeight,
         1,
-        1000
+        1000,
     );
     broad_p_camera.position.set(40, 40, 40);
     broad_p_camera.lookAt(0, 25, 0);
@@ -170,7 +171,7 @@ function createBroadOrthographicCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000
+        1000,
     );
     broad_o_camera.position.set(40, 40, 40);
     broad_o_camera.lookAt(0, 25, 0);
@@ -213,7 +214,6 @@ function createLowerCrane(x, y, z) {
     addBase(lowerCrane, 0, dimensions.hBase / 2, 0);
     addTower(lowerCrane, 0, dimensions.hTower / 2 + dimensions.hBase, 0);
 
-
     lowerCrane.position.set(x, y, z);
 }
 
@@ -222,7 +222,7 @@ function addBase(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lBase,
         dimensions.hBase,
-        dimensions.lBase
+        dimensions.lBase,
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -234,7 +234,7 @@ function addTower(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lTower,
         dimensions.hTower,
-        dimensions.lTower
+        dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
@@ -255,7 +255,7 @@ function createUpperCrane(x, y, z) {
         upperCrane,
         0,
         dimensions.hInferiorTowerPeak + dimensions.hSuperiorTowerPeak / 2,
-        0
+        0,
     );
     addInferiorTowerPeak(upperCrane, 0, dimensions.hInferiorTowerPeak / 2, 0);
     addJib(upperCrane, (dimensions.lTower + dimensions.cJib) / 2, hJib, 0);
@@ -263,24 +263,23 @@ function createUpperCrane(x, y, z) {
         upperCrane,
         (-dimensions.lTower - dimensions.cCounterJib) / 2,
         hJib,
-        0
+        0,
     );
     addCounterWeight(
         upperCrane,
         (dimensions.cCounterWeight - dimensions.lTower) / 2 -
             dimensions.cCounterJib,
         hJib - dimensions.hJib,
-        0
+        0,
     );
     addCab(
         upperCrane,
         0,
         dimensions.hDifference / 2,
-        (dimensions.lTower + dimensions.lCab) / 2
+        (dimensions.lTower + dimensions.lCab) / 2,
     );
 
     //addTurntable(upperCrane, x, y, z);
-
 
     upperCrane.position.set(x, y, z);
 
@@ -292,7 +291,7 @@ function addSuperiorTowerPeak(obj, x, y, z) {
     geometry = new THREE.ConeGeometry(
         (dimensions.lTower * 3) / 4,
         dimensions.hSuperiorTowerPeak,
-        4
+        4,
     ).rotateY(3.925);
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -303,7 +302,7 @@ function addInferiorTowerPeak(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lTower,
         dimensions.hInferiorTowerPeak,
-        dimensions.lTower
+        dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -315,7 +314,7 @@ function addJib(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cJib,
         dimensions.hJib,
-        dimensions.lTower
+        dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -327,7 +326,7 @@ function addCounterJib(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cCounterJib,
         dimensions.hJib,
-        dimensions.lTower
+        dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -339,7 +338,7 @@ function addCounterWeight(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cCounterWeight,
         dimensions.hCounterWeight,
-        dimensions.lTower
+        dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -351,7 +350,7 @@ function addCab(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lTower,
         dimensions.lTower,
-        dimensions.lCab
+        dimensions.lCab,
     );
     mesh = new THREE.Mesh(geometry, materials.lightBlue);
     mesh.position.set(x, y, z);
@@ -369,7 +368,6 @@ function createTrolleyObject(x, y, z) {
     addTrolley(trolley, 0, -dimensions.hTrolley / 2, 0);
     //addClawBase(trolley, 0, maxClawHeight, 0);
 
-
     trolley.position.set(x, y, z);
 }
 
@@ -378,7 +376,7 @@ function addTrolley(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cTrolley,
         dimensions.hTrolley,
-        dimensions.lTower
+        dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -396,7 +394,6 @@ function createClaw(x, y, z) {
     // Posições relativas ao novo referencial
     addClawBase(claw, 0, dimensions.hClawBase / 2, 0);
 
-
     claw.position.set(x, y, z);
 }
 
@@ -405,7 +402,7 @@ function addClawBase(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lClawBase,
         dimensions.hClawBase,
-        dimensions.lClawBase
+        dimensions.lClawBase,
     );
     mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
