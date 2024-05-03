@@ -314,12 +314,11 @@ function init() {
     document.body.appendChild(renderer.domElement);
 
     createScene();
-    createCameras();
 
+    createCameras();
     curr_camera = broad_p_camera;
 
     bindEvents();
-    render();
 }
 
 /////////////////////
@@ -327,6 +326,8 @@ function init() {
 /////////////////////
 function animate() {
     "use strict";
+    render();
+    requestAnimationFrame(animate);
 }
 
 ////////////////////////////
@@ -357,7 +358,7 @@ function onResize() {
 function onKeyDown(e) {
     "use strict";
 
-    switch (e.keycode) {
+    switch (e.keyCode) {
         case 49: //1
             curr_camera = frontal_camera;
             scene.traverse(function (node) {
