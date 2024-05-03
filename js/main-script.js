@@ -289,7 +289,7 @@ function createUpperCrane(x, y, z) {
 function addSuperiorTowerPeak(obj, x, y, z) {
     "use strict";
     geometry = new THREE.ConeGeometry(
-        (dimensions.lTower * 3) / 4,
+        dimensions.lTower * Math.sqrt(2) / 2,
         dimensions.hSuperiorTowerPeak,
         4,
     ).rotateY(3.925);
