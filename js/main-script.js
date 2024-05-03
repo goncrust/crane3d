@@ -8,7 +8,7 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 /* GLOBAL VARIABLES */
 //////////////////////
 
-var curr_camera,
+let curr_camera,
     lateral_camera,
     top_camera,
     frontal_camera,
@@ -16,9 +16,11 @@ var curr_camera,
     broad_p_camera,
     broad_o_camera;
 
-var scene, renderer, geometry, mesh;
-var lowerCrane, upperCrane, trolley;
-var materials = {
+let scene, renderer, geometry, mesh;
+
+let lowerCrane, upperCrane, trolley;
+
+let materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
     darkOrange: new THREE.MeshBasicMaterial({
         color: 0xfc6d00,
@@ -33,7 +35,8 @@ var materials = {
         wireframe: false,
     }),
 };
-var dimensions = {
+
+let dimensions = {
     hBase: 5,
     lBase: 10,
     hTower: 20,
