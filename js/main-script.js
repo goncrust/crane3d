@@ -17,7 +17,7 @@ var curr_camera,
     broad_o_camera;
 
 var scene, renderer, geometry, mesh;
-var lowerCrane, upperCrane;
+var lowerCrane, upperCrane, trolley;
 var materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
     darkOrange: new THREE.MeshBasicMaterial({
@@ -166,7 +166,7 @@ function createCrane() {
 
     createLowerCrane(0, 0, 0);
     createUpperCrane(0, height_upperTower, 0);
-    createTrolleyObject(0, ref_trolley, 0);
+    createTrolleyObject(dimensions.cJib / 2, ref_trolley, 0);
     //createClaw
 }
 
@@ -334,13 +334,13 @@ function addCab(obj, x, y, z) {
 function createTrolleyObject(x, y, z) {
     "use strict";
 
-    var trolley = new THREE.Object3D();
+    trolley = new THREE.Object3D();
 
     // Referencial Neto: Carrinho
     trolley.add(new THREE.AxesHelper(10));
 
     // Posições relativas ao novo referencial
-    addTrolley(trolley, 0, -dimensions.hTrolley/2, 0);
+    addTrolley(trolley, 0, -dimensions.hTrolley / 2, 0);
 
     scene.add(trolley);
 
@@ -354,7 +354,7 @@ function addTrolley(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cTrolley,
         dimensions.hTrolley,
-        dimensions.lTower
+        dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -474,8 +474,17 @@ function onKeyDown(e) {
             upperCrane.rotateY(-0.1);
             break;
         case 87: //w
+            let max_x =
+                dimensions.cJib +
+                dimensions.lTower / 2 -
+                dimensions.cTrolley / 2;
+            if (trolley.position.x < max_x)
+                trolley.position.x = Math.min(trolley.position.x + 1, max_x);
             break;
         case 83: //s
+            let min_x = dimensions.lTower / 2 + dimensions.cTrolley / 2;
+            if (trolley.position.x > min_x)
+                trolley.position.x = Math.max(trolley.position.x - 1, min_x);
             break;
         case 69: //e
             break;
