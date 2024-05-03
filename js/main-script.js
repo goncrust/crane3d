@@ -20,18 +20,18 @@ var curr_camera,
 
 var scene, renderer, geometry, mesh;
 var materials = {
-    grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: true }),
+    grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
     darkOrange: new THREE.MeshBasicMaterial({
         color: 0xfc6d00,
-        wireframe: true,
+        wireframe: false,
     }),
     lightOrange: new THREE.MeshBasicMaterial({
         color: 0xfcc100,
-        wireframe: true,
+        wireframe: false,
     }),
     lightBlue: new THREE.MeshBasicMaterial({
         color: 0x85e6fc,
-        wireframe: true,
+        wireframe: false,
     }),
 };
 var dimensions = {
@@ -42,7 +42,6 @@ var dimensions = {
     lCab: 0,
     hCounterWeight: 5,
     cCounterWeight: 10,
-    hCounterJib: 0,
     cCounterJib: 15,
     hJib: 5,
     cJib: 30,
@@ -212,6 +211,7 @@ function addTower(obj, x, y, z) {
 
 function createUpperCrane(x, y, z) {
     "use strict";
+    var hJib = dimensions.hDifference+dimensions.hJib/2;
 
     var upperCrane = new THREE.Object3D();
 
@@ -234,19 +234,19 @@ function createUpperCrane(x, y, z) {
     addJib(
         upperCrane, 
         (dimensions.lTower+dimensions.cJib) / 2, 
-        dimensions.hInferiorTowerPeak - (dimensions.hJib / 2), 
+        hJib, 
         0
     );
     addCounterJib(
         upperCrane, 
         (-dimensions.lTower-dimensions.cCounterJib)/2, 
-        dimensions.hInferiorTowerPeak - (dimensions.hJib / 2), 
+        hJib, 
         0
     );
     addCounterWeight(
         upperCrane, 
         (dimensions.cCounterWeight - dimensions.lTower)/2 - dimensions.cCounterJib, 
-        dimensions.hInferiorTowerPeak - (dimensions.hJib * 3/2),
+        hJib - dimensions.hJib,
         0
     );
 
