@@ -58,7 +58,7 @@ let dimensions = {
     hClaw: 0,
 };
 
-let maxClawHeight = -(dimensions.hTrolley+dimensions.hClawBase);
+let maxClawHeight = -(dimensions.hTrolley + dimensions.hClawBase);
 let claw;
 
 /////////////////////
@@ -89,37 +89,49 @@ function createCameras() {
 
 function createLateralCamera() {
     "use strict";
-    lateral_camera = new THREE.PerspectiveCamera(
-        70,
-        window.innerWidth / window.innerHeight,
+    let aspectRatio = window.innerWidth / window.innerHeight;
+    let viewSize = 70;
+    lateral_camera = new THREE.OrthographicCamera(
+        (aspectRatio * viewSize) / -2,
+        (aspectRatio * viewSize) / 2,
+        viewSize / 2,
+        viewSize / -2,
         1,
         1000,
     );
-    lateral_camera.position.set(0, 50, 130);
-    lateral_camera.lookAt(0, 50, 0);
+    lateral_camera.position.set(0, 30, 70);
+    lateral_camera.lookAt(0, 30, 0);
 }
 
 function createFrontalCamera() {
     "use strict";
-    frontal_camera = new THREE.PerspectiveCamera(
-        70,
-        window.innerWidth / window.innerHeight,
+    let aspectRatio = window.innerWidth / window.innerHeight;
+    let viewSize = 70;
+    frontal_camera = new THREE.OrthographicCamera(
+        (aspectRatio * viewSize) / -2,
+        (aspectRatio * viewSize) / 2,
+        viewSize / 2,
+        viewSize / -2,
         1,
         1000,
     );
-    frontal_camera.position.set(100, 50, 0);
-    frontal_camera.lookAt(0, 50, 0);
+    frontal_camera.position.set(100, 30, 0);
+    frontal_camera.lookAt(0, 30, 0);
 }
 
 function createTopCamera() {
     "use strict";
-    top_camera = new THREE.PerspectiveCamera(
-        70,
-        window.innerWidth / window.innerHeight,
+    let aspectRatio = window.innerWidth / window.innerHeight;
+    let viewSize = 70;
+    top_camera = new THREE.OrthographicCamera(
+        (aspectRatio * viewSize) / -2,
+        (aspectRatio * viewSize) / 2,
+        viewSize / 2,
+        viewSize / -2,
         1,
         1000,
     );
-    top_camera.position.set(0, 100, 0);
+    top_camera.position.set(0, 70, 0);
     top_camera.lookAt(0, 0, 0);
 }
 
@@ -144,20 +156,24 @@ function createBroadPerpectiveCamera() {
         1,
         1000,
     );
-    broad_p_camera.position.set(75, 75, 75);
-    broad_p_camera.lookAt(0, 50, 0);
+    broad_p_camera.position.set(40, 40, 40);
+    broad_p_camera.lookAt(0, 25, 0);
 }
 
 function createBroadOrthographicCamera() {
     "use strict";
-    broad_o_camera = new THREE.PerspectiveCamera(
-        70,
-        window.innerWidth / window.innerHeight,
+    let aspectRatio = window.innerWidth / window.innerHeight;
+    let viewSize = 70;
+    broad_o_camera = new THREE.OrthographicCamera(
+        (aspectRatio * viewSize) / -2,
+        (aspectRatio * viewSize) / 2,
+        viewSize / 2,
+        viewSize / -2,
         1,
         1000,
     );
-    broad_o_camera.position.set(75, 75, 75);
-    broad_o_camera.lookAt(0, 50, 0);
+    broad_o_camera.position.set(40, 40, 40);
+    broad_o_camera.lookAt(0, 25, 0);
 }
 
 ////////////////////////
@@ -173,11 +189,11 @@ function createCrane() {
     createLowerCrane(0, 0, 0);
     createUpperCrane(0, height_upperTower, 0);
     lowerCrane.add(upperCrane);
-    
+
     createTrolleyObject(dimensions.cJib / 2, height_trolley, 0);
     upperCrane.add(trolley);
 
-    createClaw(0, -(dimensions.hTrolley+dimensions.hClawBase), 0);
+    createClaw(0, -(dimensions.hTrolley + dimensions.hClawBase), 0);
     trolley.add(claw);
 }
 
@@ -381,7 +397,7 @@ function createClaw(x, y, z) {
     claw.add(new THREE.AxesHelper(10));
 
     // Posições relativas ao novo referencial
-    addClawBase(claw, 0, dimensions.hClawBase/2, 0);
+    addClawBase(claw, 0, dimensions.hClawBase / 2, 0);
 
     scene.add(claw);
 
