@@ -8,8 +8,6 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 /* GLOBAL VARIABLES */
 //////////////////////
 
-var ref_wcs, ref_rotation, ref_car, ref_claw;
-
 var curr_camera,
     lateral_camera,
     top_camera,
@@ -48,9 +46,9 @@ var dimensions = {
     cJib: 30,
     hDifference: 10,
     hInferiorTowerPeak: 20,
-    hSuperiorTowerPeak: 10,
-    hTrolley: 0,
-    cTrolley: 0,
+    hSuperiorTowerPeak: 5,
+    hTrolley: 3,
+    cTrolley: 6,
     lClawBase: 0,
     hClawBase: 0,
     lClaw: 0,
@@ -163,9 +161,12 @@ function createBroadOrthographicCamera() {
 function createCrane() {
     "use strict";
 
+    var height_upperTower = dimensions.hBase + dimensions.hTower;
+    var ref_trolley = height_upperTower + dimensions.hDifference;
+
     createLowerCrane(0, 0, 0);
-    createUpperCrane(0, dimensions.hBase + dimensions.hTower, 0);
-    //createCar
+    createUpperCrane(0, height_upperTower, 0);
+    createTrolleyObject(0, ref_trolley, 0);
     //createClaw
 }
 
@@ -255,6 +256,8 @@ function createUpperCrane(x, y, z) {
     upperCrane.position.x = x;
     upperCrane.position.y = y;
     upperCrane.position.z = z;
+
+    upperCrane.rotateY(0);
 }
 
 function addSuperiorTowerPeak(obj, x, y, z) {
@@ -263,8 +266,8 @@ function addSuperiorTowerPeak(obj, x, y, z) {
         (dimensions.lTower * 3) / 4,
         dimensions.hSuperiorTowerPeak,
         4,
-    ).rotateY(3.9);
-    mesh = new THREE.Mesh(geometry, materials.lightOrange);
+    ).rotateY(3.925);
+    mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
@@ -324,6 +327,36 @@ function addCab(obj, x, y, z) {
         dimensions.lCab,
     );
     mesh = new THREE.Mesh(geometry, materials.lightBlue);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function createTrolleyObject(x, y, z) {
+    "use strict";
+
+    var trolley = new THREE.Object3D();
+
+    // Referencial Neto: Carrinho
+    trolley.add(new THREE.AxesHelper(10));
+
+    // Posições relativas ao novo referencial
+    addTrolley(trolley, 0, -dimensions.hTrolley/2, 0);
+
+    scene.add(trolley);
+
+    trolley.position.x = x;
+    trolley.position.y = y;
+    trolley.position.z = z;
+}
+
+function addTrolley(obj, x, y, z) {
+    "use strict";
+    geometry = new THREE.BoxGeometry(
+        dimensions.cTrolley,
+        dimensions.hTrolley,
+        dimensions.lTower
+    );
+    mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
