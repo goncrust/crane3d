@@ -39,7 +39,7 @@ var dimensions = {
     lBase: 10,
     hTower: 20,
     lTower: 5,
-    lCab: 0,
+    lCab: 5,
     hCounterWeight: 5,
     cCounterWeight: 10,
     cCounterJib: 15,
@@ -173,7 +173,7 @@ function createLowerCrane(x, y, z) {
 
     var lowerCrane = new THREE.Object3D();
 
-    lowerCrane.add(new THREE.AxesHelper(5));
+    lowerCrane.add(new THREE.AxesHelper(10));
 
     addBase(lowerCrane, 0, dimensions.hBase / 2, 0);
     addTower(lowerCrane, 0, dimensions.hTower / 2 + dimensions.hBase, 0);
@@ -216,7 +216,7 @@ function createUpperCrane(x, y, z) {
     var upperCrane = new THREE.Object3D();
 
     // Referencial Filho: Eixo Rotatório
-    upperCrane.add(new THREE.AxesHelper(5));
+    upperCrane.add(new THREE.AxesHelper(10));
 
     // Posições relativas ao novo referencial
     addSuperiorTowerPeak(
@@ -249,9 +249,14 @@ function createUpperCrane(x, y, z) {
         hJib - dimensions.hJib,
         0
     );
+    addCab(
+        upperCrane, 
+        0, 
+        dimensions.hDifference/2, 
+        (dimensions.lTower+dimensions.lCab)/2
+    );
 
     //addTurntable(upperCrane, x, y, z);
-    //addCab(upperCrane, x, y, z);
 
     scene.add(upperCrane);
 
@@ -266,7 +271,7 @@ function addSuperiorTowerPeak(obj, x, y, z) {
         (dimensions.lTower * 3) / 4,
         dimensions.hSuperiorTowerPeak,
         4,
-    ).rotateY(4);
+    ).rotateY(3.9);
     mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
     obj.add(mesh);
@@ -315,6 +320,18 @@ function addCounterWeight(obj, x, y, z) {
         dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function addCab(obj, x, y, z) {
+    "use strict";
+    geometry = new THREE.BoxGeometry(
+        dimensions.lTower,
+        dimensions.lTower,
+        dimensions.lCab,
+    );
+    mesh = new THREE.Mesh(geometry, materials.lightBlue);
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
