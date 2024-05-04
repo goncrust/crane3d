@@ -584,6 +584,9 @@ function handleCollisions() {
 ////////////
 function update() {
     "use strict";
+    keyUpdate();
+    updateClawCamera();
+
     trolleyX = Math.min(trolleyX, MAX_TROLLEY_X);
     trolleyX = Math.max(trolleyX, MIN_TROLLEY_X);
     trolley.position.x = trolleyX;
@@ -607,8 +610,58 @@ function update() {
     clawY = Math.min(clawY, MAX_CLAW_Y);
     clawY = Math.max(clawY, MIN_CLAW_Y);
     claw.position.y = clawY;
+}
 
-    updateClawCamera();
+function keyUpdate() {
+    let scaler = 0.3;
+    for (const key in pressedKeys) {
+        if (pressedKeys[key]) {
+            switch (key) {
+                case "1":
+                    currCamera = frontalCamera;
+                    for (let material in materials) {
+                        materials[material].wireframe =
+                            !materials[material].wireframe;
+                    }
+                    break;
+                case "2":
+                    currCamera = lateralCamera;
+                    break;
+                case "3":
+                    currCamera = topCamera;
+                    break;
+                case "4":
+                    currCamera = broadOCamera;
+                    break;
+                case "5":
+                    currCamera = broadPCamera;
+                    break;
+                case "6":
+                    currCamera = clawCamera;
+                    break;
+                case "q":
+                    towerAngle += scaler * 0.1;
+                    break;
+                case "a":
+                    towerAngle -= scaler * 0.1;
+                    break;
+                case "w":
+                    trolleyX += scaler * 1;
+                    break;
+                case "s":
+                    trolleyX -= scaler * 1;
+                    break;
+                case "e":
+                    ropeScale -= scaler * 0.2;
+                    clawY += scaler * 1;
+                    break;
+                case "d":
+                    ropeScale += scaler * 0.2;
+                    clawY -= scaler * 1;
+                    break;
+            }
+        }
+    }
 }
 
 function updateClawCamera() {
@@ -679,62 +732,10 @@ function onResize() {
 ///////////////////////
 function onKeyDown(e) {
     "use strict";
-
     if (!pressedKeys.hasOwnProperty(e.key)) {
         return;
     }
-
     pressedKeys[e.key] = true;
-
-    for (const key in pressedKeys) {
-        if (pressedKeys[key]) {
-            switch (key) {
-                case "1":
-                    currCamera = frontalCamera;
-                    for (let material in materials) {
-                        materials[material].wireframe =
-                            !materials[material].wireframe;
-                    }
-                    break;
-                case "2":
-                    currCamera = lateralCamera;
-                    break;
-                case "3":
-                    currCamera = topCamera;
-                    break;
-                case "4":
-                    currCamera = broadOCamera;
-                    break;
-                case "5":
-                    currCamera = broadPCamera;
-                    break;
-                case "6":
-                    currCamera = clawCamera;
-                    break;
-                case "q":
-                    towerAngle += 0.1;
-                    break;
-                case "a":
-                    towerAngle -= 0.1;
-                    break;
-                case "w":
-                    trolleyX += 1;
-                    break;
-                case "s":
-                    trolleyX -= 1;
-                    break;
-                case "e":
-                    ropeScale -= 0.2;
-                    clawY += 1;
-                    break;
-                case "d":
-                    console.log(trolley);
-                    ropeScale += 0.2;
-                    clawY -= 1;
-                    break;
-            }
-        }
-    }
 }
 
 ///////////////////////
