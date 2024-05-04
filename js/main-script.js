@@ -63,30 +63,38 @@ let dimensions = {
 };
 
 let pressedKeys = {
-    '1': false,
-    '2': false,
-    '3': false,
-    '4': false,
-    '5': false,
-    'q': false,
-    'a': false,
-    'w': false,
-    's': false,
-    'e': false,
-    'd': false,
+    1: false,
+    2: false,
+    3: false,
+    4: false,
+    5: false,
+    q: false,
+    a: false,
+    w: false,
+    s: false,
+    e: false,
+    d: false,
 };
 
-const MAX_TROLLEY_X = dimensions.cJib + dimensions.lTower / 2 - dimensions.cTrolley / 2;
+const MAX_TROLLEY_X =
+    dimensions.cJib + dimensions.lTower / 2 - dimensions.cTrolley / 2;
 const MIN_TROLLEY_X = dimensions.lTower / 2 + dimensions.cTrolley / 2;
 
 const MIN_ROPE_SCALE = 0;
-const MAX_ROPE_SCALE = (dimensions.hTower + dimensions.hDifference - dimensions.hTrolley) / BASE_H_ROPE;
+const MAX_ROPE_SCALE =
+    (dimensions.hTower + dimensions.hDifference - dimensions.hTrolley) /
+    BASE_H_ROPE;
 
 const Y_AXIS = new THREE.Vector3(0, 1, 0);
 const MIN_TOWER_ANGLE = 0;
 const MAX_TOWER_ANGLE = Math.PI;
 
-let ropeScale, trolleyX, towerAngle;
+const MAX_CLAW_Y = -dimensions.hTrolley - dimensions.hClawBase;
+
+const MIN_CLAW_Y =
+    -dimensions.hDifference - dimensions.hTower - dimensions.hClawBase;
+
+let ropeScale, trolleyX, towerAngle, clawY;
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -101,6 +109,8 @@ function createScene() {
     //scene.add(new THREE.AxesHelper(10));
 
     createCrane();
+    // createCrates()
+    // createContainer()
 }
 
 //////////////////////
@@ -125,7 +135,7 @@ function createLateralCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000,
+        1000
     );
     lateralCamera.position.set(0, 30, 70);
     lateralCamera.lookAt(0, 30, 0);
@@ -141,7 +151,7 @@ function createFrontalCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000,
+        1000
     );
     frontalCamera.position.set(100, 30, 0);
     frontalCamera.lookAt(0, 30, 0);
@@ -157,7 +167,7 @@ function createTopCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000,
+        1000
     );
     topCamera.position.set(0, 70, 0);
     topCamera.lookAt(0, 0, 0);
@@ -169,7 +179,7 @@ function createClawCamera() {
         70,
         window.innerWidth / window.innerHeight,
         1,
-        1000,
+        1000
     );
     // TODO
     clawCamera.position.set(50, 50, 50);
@@ -182,7 +192,7 @@ function createBroadPerpectiveCamera() {
         70,
         window.innerWidth / window.innerHeight,
         1,
-        1000,
+        1000
     );
     broadPCamera.position.set(40, 40, 40);
     broadPCamera.lookAt(0, 25, 0);
@@ -198,7 +208,7 @@ function createBroadOrthographicCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000,
+        1000
     );
     broadOCamera.position.set(40, 40, 40);
     broadOCamera.lookAt(0, 25, 0);
@@ -217,6 +227,7 @@ function createCrane() {
     ropeScale = 1;
     trolleyX = dimensions.cJib / 2;
     towerAngle = 0;
+    clawY = -dimensions.hRope - dimensions.hTrolley - dimensions.hClawBase;
 
     crane = new THREE.Object3D();
 
@@ -229,8 +240,8 @@ function createCrane() {
     createTrolley(trolleyX, heightTrolley, 0);
     upperCrane.add(trolley);
 
-    // createClaw(0, -(dimensions.hTrolley + dimensions.hRope), 0);
-    // trolley.add(claw);
+    createClaw(0, clawY, 0);
+    trolley.add(claw);
 
     scene.add(crane);
 }
@@ -253,7 +264,7 @@ function addBase(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lBase,
         dimensions.hBase,
-        dimensions.lBase,
+        dimensions.lBase
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -265,7 +276,7 @@ function addTower(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lTower,
         dimensions.hTower,
-        dimensions.lTower,
+        dimensions.lTower
     );
     mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
@@ -286,7 +297,7 @@ function createUpperCrane(x, y, z) {
         upperCrane,
         0,
         dimensions.hInferiorTowerPeak + dimensions.hSuperiorTowerPeak / 2,
-        0,
+        0
     );
     addInferiorTowerPeak(upperCrane, 0, dimensions.hInferiorTowerPeak / 2, 0);
     addJib(upperCrane, (dimensions.lTower + dimensions.cJib) / 2, hJib, 0);
@@ -294,20 +305,20 @@ function createUpperCrane(x, y, z) {
         upperCrane,
         (-dimensions.lTower - dimensions.cCounterJib) / 2,
         hJib,
-        0,
+        0
     );
     addCounterWeight(
         upperCrane,
         (dimensions.cCounterWeight - dimensions.lTower) / 2 -
             dimensions.cCounterJib,
         hJib - dimensions.hJib,
-        0,
+        0
     );
     addCab(
         upperCrane,
         0,
         dimensions.hDifference / 2,
-        (dimensions.lTower + dimensions.lCab) / 2,
+        (dimensions.lTower + dimensions.lCab) / 2
     );
 
     //addTurntable(upperCrane, x, y, z);
@@ -320,9 +331,9 @@ function createUpperCrane(x, y, z) {
 function addSuperiorTowerPeak(obj, x, y, z) {
     "use strict";
     geometry = new THREE.ConeGeometry(
-        dimensions.lTower * Math.sqrt(2) / 2,
+        (dimensions.lTower * Math.sqrt(2)) / 2,
         dimensions.hSuperiorTowerPeak,
-        4,
+        4
     ).rotateY(3.925);
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -334,7 +345,7 @@ function addInferiorTowerPeak(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lTower,
         dimensions.hInferiorTowerPeak,
-        dimensions.lTower,
+        dimensions.lTower
     );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -346,7 +357,7 @@ function addJib(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cJib,
         dimensions.hJib,
-        dimensions.lTower,
+        dimensions.lTower
     );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -358,7 +369,7 @@ function addCounterJib(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cCounterJib,
         dimensions.hJib,
-        dimensions.lTower,
+        dimensions.lTower
     );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -370,7 +381,7 @@ function addCounterWeight(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cCounterWeight,
         dimensions.hCounterWeight,
-        dimensions.lTower,
+        dimensions.lTower
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -382,7 +393,7 @@ function addCab(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lTower,
         dimensions.lTower,
-        dimensions.lCab,
+        dimensions.lCab
     );
     mesh = new THREE.Mesh(geometry, materials.lightBlue);
     mesh.position.set(x, y, z);
@@ -399,7 +410,12 @@ function createTrolley(x, y, z) {
     // Posições relativas ao novo referencial
     addTrolley(trolley, 0, -dimensions.hTrolley / 2, 0);
     addRope(trolley, 0, -(dimensions.hTrolley + dimensions.hRope / 2), 0);
-    addClawBase(trolley, 0, -(dimensions.hTrolley + dimensions.hRope + dimensions.hClawBase / 2), 0);
+    addClawBase(
+        trolley,
+        0,
+        -(dimensions.hTrolley + dimensions.hRope + dimensions.hClawBase / 2),
+        0
+    );
 
     trolley.position.set(x, y, z);
 }
@@ -409,7 +425,7 @@ function addTrolley(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cTrolley,
         dimensions.hTrolley,
-        dimensions.lTower,
+        dimensions.lTower
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -421,11 +437,11 @@ function addRope(obj, x, y, z) {
     geometry = new THREE.CylinderGeometry(
         dimensions.rRope,
         dimensions.rRope,
-        dimensions.hRope,
+        dimensions.hRope
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
-    mesh.name = 'rope';
+    mesh.name = "rope";
     obj.add(mesh);
 }
 
@@ -434,11 +450,11 @@ function addClawBase(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lClawBase,
         dimensions.hClawBase,
-        dimensions.lClawBase,
+        dimensions.lClawBase
     );
     mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
-    mesh.name = 'clawBase';
+    mesh.name = "clawBase";
     obj.add(mesh);
 }
 
@@ -450,9 +466,12 @@ function createClaw(x, y, z) {
     claw.add(new THREE.AxesHelper(10));
 
     // Posições relativas ao novo referencial
+    // addClawFinger(claw, 0, 0, 0);
 
     claw.position.set(x, y, z);
 }
+
+function createCrates() {}
 
 //////////////////////
 /* CHECK COLLISIONS */
@@ -484,10 +503,18 @@ function update() {
     ropeScale = Math.min(ropeScale, MAX_ROPE_SCALE);
     ropeScale = Math.max(ropeScale, MIN_ROPE_SCALE);
     dimensions.hRope = BASE_H_ROPE * ropeScale;
-    let rope = trolley.getObjectByName('rope');
+    let rope = trolley.getObjectByName("rope");
     rope.scale.y = ropeScale;
     rope.position.y = -(dimensions.hTrolley + dimensions.hRope / 2);
-    trolley.getObjectByName('clawBase').position.y = -(dimensions.hTrolley + dimensions.hRope + dimensions.hClawBase / 2);
+    trolley.getObjectByName("clawBase").position.y = -(
+        dimensions.hTrolley +
+        dimensions.hRope +
+        dimensions.hClawBase / 2
+    );
+
+    clawY = Math.min(clawY, MAX_CLAW_Y);
+    clawY = Math.max(clawY, MIN_CLAW_Y);
+    claw.position.y = clawY;
 }
 
 /////////////
@@ -562,45 +589,48 @@ function onKeyDown(e) {
     for (const key in pressedKeys) {
         if (pressedKeys[key]) {
             switch (key) {
-                case '1':
+                case "1":
                     currCamera = frontalCamera;
                     for (let material in materials) {
-                        materials[material].wireframe = !materials[material].wireframe;
+                        materials[material].wireframe =
+                            !materials[material].wireframe;
                     }
                     break;
-                case '2':
+                case "2":
                     currCamera = lateralCamera;
                     break;
-                case '3':
+                case "3":
                     currCamera = topCamera;
                     break;
-                case '4':
+                case "4":
                     currCamera = broadOCamera;
                     break;
-                case '5':
+                case "5":
                     currCamera = broadPCamera;
                     break;
-                case '6':
+                case "6":
                     currCamera = clawCamera;
                     break;
-                case 'q':
+                case "q":
                     towerAngle += 0.1;
                     break;
-                case 'a':
+                case "a":
                     towerAngle -= 0.1;
                     break;
-                case 'w':
+                case "w":
                     trolleyX += 1;
                     break;
-                case 's':
+                case "s":
                     trolleyX -= 1;
                     break;
-                case 'e':
+                case "e":
+                    ropeScale -= 0.2;
+                    clawY += 1;
+                    break;
+                case "d":
                     console.log(trolley);
                     ropeScale += 0.2;
-                    break;
-                case 'd':
-                    ropeScale -= 0.2;
+                    clawY -= 1;
                     break;
             }
         }
