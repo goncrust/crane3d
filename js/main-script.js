@@ -10,6 +10,7 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 //////////////////////
 
 let currCamera,
+    currCameraLabel,
     lateralCamera,
     topCamera,
     frontalCamera,
@@ -23,6 +24,7 @@ let crane, lowerCrane, upperCrane, trolley, claw;
 
 let crate1, crate2, crate3, container;
 
+let wireframe = false;
 let materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
     darkOrange: new THREE.MeshBasicMaterial({
@@ -279,20 +281,48 @@ function createBroadOrthographicCamera() {
 /* CREATE OBJECT3D(S) */
 ////////////////////////
 
+function createHud() {
+    "use strict";
+    let hud = document.createElement('div');
+    hud.className = "hud";
+    addBindInfo(hud);
+    addStateInfo(hud);
+    document.body.appendChild(hud);
+}
+
+function addStateInfo(domObj) {
+    "use strict";
+    let stateInfo = document.createElement('div');
+    stateInfo.className = "state-info";
+
+    let wireframeState = document.createElement('div');
+    wireframeState.id = "wireframe-state";
+    wireframeState.innerHTML = `Wireframe: <span class="active">${wireframe ? "active" : "inactive"}</span>`;
+    stateInfo.appendChild(wireframeState);
+
+    let cameraState = document.createElement('div');
+    cameraState.id = "camera-state";
+    cameraState.innerHTML = `Camera: <span class="active">${currCameraLabel}</span>`;
+    stateInfo.appendChild(cameraState);
+
+    domObj.appendChild(stateInfo);
+}
+
+function addBindInfo(domObj) {
+    "use strict";
+    let binds = document.createElement('div');
+    binds.className = "binds";
+    BIND_INFORMATION.map(info => addBindIndication(binds, info));
+    domObj.appendChild(binds);
+}
+
 function addBindIndication(domObj, bindInformation) {
+    "use strict";
     const {key , description} = bindInformation;
     let bindIndication = document.createElement('div');
     bindIndication.id = key;
     bindIndication.innerText = `${key} - ${description}`;
     domObj.appendChild(bindIndication);
-}
-
-function createHud() {
-    "use strict";
-    let hud = document.createElement('div');
-    hud.className = "hud";
-    BIND_INFORMATION.map(info => addBindIndication(hud, info));
-    document.body.appendChild(hud);
 }
 
 function createCrane() {
@@ -695,6 +725,9 @@ function updateHUD() {
             domElement.className = pressedKeys[key] ? "active" : "";
         }
     }
+
+    document.getElementById("wireframe-state").innerHTML = `Wireframe: <span class="active">${wireframe ? "active" : "inactive"}</span>`;
+    document.getElementById("camera-state").innerHTML = `Camera: <span class="active">${currCameraLabel}</span>`;
 }
 
 /////////////
@@ -717,10 +750,11 @@ function init() {
     document.body.appendChild(renderer.domElement);
 
     createScene();
-    createHud();
     bindEvents();
     createCameras();
     currCamera = broadPCamera;
+    currCameraLabel = "Broad perspective camera";
+    createHud();
 }
 
 /////////////////////
@@ -772,6 +806,8 @@ function onKeyDown(e) {
             switch (key) {
                 case "1":
                     currCamera = frontalCamera;
+                    currCameraLabel = "Frontal camera";
+                    wireframe = !wireframe;
                     for (let material in materials) {
                         materials[material].wireframe =
                             !materials[material].wireframe;
@@ -779,18 +815,23 @@ function onKeyDown(e) {
                     break;
                 case "2":
                     currCamera = lateralCamera;
+                    currCameraLabel = "Lateral camera";
                     break;
                 case "3":
                     currCamera = topCamera;
+                    currCameraLabel = "Top camera";
                     break;
                 case "4":
                     currCamera = broadOCamera;
+                    currCameraLabel = "Broad orthographic camera";
                     break;
                 case "5":
                     currCamera = broadPCamera;
+                    currCameraLabel = "Broad perspective camera";
                     break;
                 case "6":
                     currCamera = clawCamera;
+                    currCameraLabel = "Claw camera";
                     break;
                 case "q":
                     towerAngle += 0.1;
