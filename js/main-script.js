@@ -189,11 +189,9 @@ function createClawCamera() {
     "use strict";
     let aspectRatio = window.innerWidth / window.innerHeight;
     let viewSize = 70;
-    clawCamera = new THREE.OrthographicCamera(
-        (aspectRatio * viewSize) / -2,
-        (aspectRatio * viewSize) / 2,
-        viewSize / 2,
-        viewSize / -2,
+    clawCamera = new THREE.PerspectiveCamera(
+        70,
+        window.innerWidth / window.innerHeight,
         1,
         1000
     );
@@ -201,9 +199,8 @@ function createClawCamera() {
     let heightUpperTower = dimensions.hBase + dimensions.hTower;
     let heightTrolley = dimensions.hDifference;
 
-    clawCamera.position.set(100, 0, 0);
-    //clawCamera.position.set(trolleyX, heightUpperTower+heightTrolley, 0);
-    clawCamera.lookAt(0, 0, 0);
+    //clawCamera.position.set(trolley.position.x, claw.position.y, trolley.position.z);
+    //clawCamera.lookAt(trolley.position.x, 0, trolley.position.z);
 }
 
 function createBroadPerpectiveCamera() {
@@ -487,7 +484,11 @@ function createClaw(x, y, z) {
 
     claw.position.set(x, y, z);
 
-    //claw.add(clawCamera);
+    claw.add(clawCamera);
+}
+
+function addClawFinger(obj, x, y, z) {
+
 }
 
 function createCrates() {
@@ -618,18 +619,14 @@ function update() {
     clawY = Math.max(clawY, MIN_CLAW_Y);
     claw.position.y = clawY;
 
-    //updateClawCamera(trolleyX, clawY, 0);
+    updateClawCamera(trolleyX, clawY, 0);
 }
 
 function updateClawCamera(x, y, z) {
     // TODO
-    let height = dimensions.hBase + dimensions.hTower + dimensions.hDifference;
 
-    //clawCamera.position.set(trolleyX, heightUpperTower+heightTrolley, 0);
-    clawCamera.lookAt(0, 0, 0);
-
-    clawCamera.position.set(x, y + height, z);
-    clawCamera.lookAt(0, 0, 0);
+    clawCamera.position.set(x, y, z);
+    clawCamera.lookAt(trolley.position.x, 0, trolley.position.z);
 }
 
 /////////////
