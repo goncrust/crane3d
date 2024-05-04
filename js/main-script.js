@@ -10,7 +10,6 @@ import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 //////////////////////
 
 let currCamera,
-    currCameraLabel,
     lateralCamera,
     topCamera,
     frontalCamera,
@@ -24,7 +23,6 @@ let crane, lowerCrane, upperCrane, trolley, claw;
 
 let crate1, crate2, crate3, container;
 
-let wireframe = false;
 let materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
     darkOrange: new THREE.MeshBasicMaterial({
@@ -77,52 +75,52 @@ let dimensions = {
 
 const BIND_INFORMATION = [
     {
-        key: '1',
-        description: 'Change to frontal camera and toggle wireframe',
+        key: "1",
+        description: "Change to frontal camera and toggle wireframe",
     },
     {
-        key: '2',
-        description: 'Change to lateral camera',
+        key: "2",
+        description: "Change to lateral camera",
     },
     {
-        key: '3',
-        description: 'Change to top camera',
+        key: "3",
+        description: "Change to top camera",
     },
     {
-        key: '4',
-        description: 'Change to broad ortographic camera',
+        key: "4",
+        description: "Change to broad ortographic camera",
     },
     {
-        key: '5',
-        description: 'Change to broad prespective camera',
+        key: "5",
+        description: "Change to broad prespective camera",
     },
     {
-        key: '6',
-        description: 'Change to claw camera',
+        key: "6",
+        description: "Change to claw camera",
     },
     {
-        key: 'q',
-        description: 'Rotate tower counter-clockwise',
+        key: "q",
+        description: "Rotate tower counter-clockwise",
     },
     {
-        key: 'a',
-        description: 'Rotate tower clockwise',
+        key: "a",
+        description: "Rotate tower clockwise",
     },
     {
-        key: 'w',
-        description: 'Move trolley forward',
+        key: "w",
+        description: "Move trolley forward",
     },
     {
-        key: 's',
-        description: 'Move trolley backwards',
+        key: "s",
+        description: "Move trolley backwards",
     },
     {
-        key: 'e',
-        description: 'Move claw up',
+        key: "e",
+        description: "Move claw up",
     },
     {
-        key: 'd',
-        description: 'Move claw down',
+        key: "d",
+        description: "Move claw down",
     },
 ];
 
@@ -286,26 +284,7 @@ function createHud() {
     let hud = document.createElement('div');
     hud.className = "hud";
     addBindInfo(hud);
-    addStateInfo(hud);
     document.body.appendChild(hud);
-}
-
-function addStateInfo(domObj) {
-    "use strict";
-    let stateInfo = document.createElement('div');
-    stateInfo.className = "state-info";
-
-    let wireframeState = document.createElement('div');
-    wireframeState.id = "wireframe-state";
-    wireframeState.innerHTML = `Wireframe: <span class="active">${wireframe ? "active" : "inactive"}</span>`;
-    stateInfo.appendChild(wireframeState);
-
-    let cameraState = document.createElement('div');
-    cameraState.id = "camera-state";
-    cameraState.innerHTML = `Camera: <span class="active">${currCameraLabel}</span>`;
-    stateInfo.appendChild(cameraState);
-
-    domObj.appendChild(stateInfo);
 }
 
 function addBindInfo(domObj) {
@@ -681,6 +660,10 @@ function handleCollisions() {
 ////////////
 function update() {
     "use strict";
+    keyUpdate();
+    updateClawCamera();
+    updateHUD();
+
     trolleyX = Math.min(trolleyX, MAX_TROLLEY_X);
     trolleyX = Math.max(trolleyX, MIN_TROLLEY_X);
     trolley.position.x = trolleyX;
@@ -704,10 +687,64 @@ function update() {
     clawY = Math.min(clawY, MAX_CLAW_Y);
     clawY = Math.max(clawY, MIN_CLAW_Y);
     claw.position.y = clawY;
+}
 
-    updateClawCamera();
-
-    updateHUD();
+function keyUpdate() {
+    let scaler = 0.3;
+    for (const key in pressedKeys) {
+        if (pressedKeys[key]) {
+            switch (key) {
+                case "1":
+                    currCamera = frontalCamera;
+                    for (let material in materials) {
+                        materials[material].wireframe =
+                            !materials[material].wireframe;
+                    }
+                    pressedKeys[key] = false;
+                    break;
+                case "2":
+                    currCamera = lateralCamera;
+                    pressedKeys[key] = false;
+                    break;
+                case "3":
+                    currCamera = topCamera;
+                    pressedKeys[key] = false;
+                    break;
+                case "4":
+                    currCamera = broadOCamera;
+                    pressedKeys[key] = false;
+                    break;
+                case "5":
+                    currCamera = broadPCamera;
+                    pressedKeys[key] = false;
+                    break;
+                case "6":
+                    currCamera = clawCamera;
+                    pressedKeys[key] = false;
+                    break;
+                case "q":
+                    towerAngle += scaler * 0.1;
+                    break;
+                case "a":
+                    towerAngle -= scaler * 0.1;
+                    break;
+                case "w":
+                    trolleyX += scaler * 1;
+                    break;
+                case "s":
+                    trolleyX -= scaler * 1;
+                    break;
+                case "e":
+                    ropeScale -= scaler * 0.2;
+                    clawY += scaler * 1;
+                    break;
+                case "d":
+                    ropeScale += scaler * 0.2;
+                    clawY -= scaler * 1;
+                    break;
+            }
+        }
+    }
 }
 
 function updateClawCamera() {
@@ -725,9 +762,6 @@ function updateHUD() {
             domElement.className = pressedKeys[key] ? "active" : "";
         }
     }
-
-    document.getElementById("wireframe-state").innerHTML = `Wireframe: <span class="active">${wireframe ? "active" : "inactive"}</span>`;
-    document.getElementById("camera-state").innerHTML = `Camera: <span class="active">${currCameraLabel}</span>`;
 }
 
 /////////////
@@ -753,7 +787,6 @@ function init() {
     bindEvents();
     createCameras();
     currCamera = broadPCamera;
-    currCameraLabel = "Broad perspective camera";
     createHud();
 }
 
@@ -794,69 +827,10 @@ function onResize() {
 ///////////////////////
 function onKeyDown(e) {
     "use strict";
-
     if (!pressedKeys.hasOwnProperty(e.key)) {
         return;
     }
-
     pressedKeys[e.key] = true;
-
-    for (const key in pressedKeys) {
-        if (pressedKeys[key]) {
-            switch (key) {
-                case "1":
-                    currCamera = frontalCamera;
-                    currCameraLabel = "Frontal camera";
-                    wireframe = !wireframe;
-                    for (let material in materials) {
-                        materials[material].wireframe =
-                            !materials[material].wireframe;
-                    }
-                    break;
-                case "2":
-                    currCamera = lateralCamera;
-                    currCameraLabel = "Lateral camera";
-                    break;
-                case "3":
-                    currCamera = topCamera;
-                    currCameraLabel = "Top camera";
-                    break;
-                case "4":
-                    currCamera = broadOCamera;
-                    currCameraLabel = "Broad orthographic camera";
-                    break;
-                case "5":
-                    currCamera = broadPCamera;
-                    currCameraLabel = "Broad perspective camera";
-                    break;
-                case "6":
-                    currCamera = clawCamera;
-                    currCameraLabel = "Claw camera";
-                    break;
-                case "q":
-                    towerAngle += 0.1;
-                    break;
-                case "a":
-                    towerAngle -= 0.1;
-                    break;
-                case "w":
-                    trolleyX += 1;
-                    break;
-                case "s":
-                    trolleyX -= 1;
-                    break;
-                case "e":
-                    ropeScale -= 0.2;
-                    clawY += 1;
-                    break;
-                case "d":
-                    console.log(trolley);
-                    ropeScale += 0.2;
-                    clawY -= 1;
-                    break;
-            }
-        }
-    }
 }
 
 ///////////////////////
