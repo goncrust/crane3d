@@ -62,6 +62,57 @@ let dimensions = {
     hRope: BASE_H_ROPE,
 };
 
+const BIND_INFORMATION = [
+    {
+        key: '1',
+        description: 'Change to frontal camera and toggle wireframe',
+    },
+    {
+        key: '2',
+        description: 'Change to lateral camera',
+    },
+    {
+        key: '3',
+        description: 'Change to top camera',
+    },
+    {
+        key: '4',
+        description: 'Change to broad ortographic camera',
+    },
+    {
+        key: '5',
+        description: 'Change to broad prespective camera',
+    },
+    {
+        key: '6',
+        description: 'Change to claw camera',
+    },
+    {
+        key: 'q',
+        description: 'Rotate tower counter-clockwise',
+    },
+    {
+        key: 'a',
+        description: 'Rotate tower clockwise',
+    },
+    {
+        key: 'w',
+        description: 'Move trolley forward',
+    },
+    {
+        key: 's',
+        description: 'Move trolley backwards',
+    },
+    {
+        key: 'e',
+        description: 'Move claw up',
+    },
+    {
+        key: 'd',
+        description: 'Move claw down',
+    },
+];
+
 let pressedKeys = {
     '1': false,
     '2': false,
@@ -207,6 +258,22 @@ function createBroadOrthographicCamera() {
 ////////////////////////
 /* CREATE OBJECT3D(S) */
 ////////////////////////
+
+function addBindIndication(domObj, bindInformation) {
+    const {key , description} = bindInformation;
+    let bindIndication = document.createElement('div');
+    bindIndication.id = key;
+    bindIndication.innerText = `${key} - ${description}`;
+    domObj.appendChild(bindIndication);
+}
+
+function createHud() {
+    "use strict";
+    let hud = document.createElement('div');
+    hud.className = "hud";
+    BIND_INFORMATION.map(info => addBindIndication(hud, info));
+    document.body.appendChild(hud);
+}
 
 function createCrane() {
     "use strict";
@@ -510,6 +577,7 @@ function init() {
     document.body.appendChild(renderer.domElement);
 
     createScene();
+    createHud();
     bindEvents();
     createCameras();
     currCamera = broadPCamera;
