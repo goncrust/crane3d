@@ -45,6 +45,11 @@ let materials = {
         color: 0x6f4e37,
         wireframe: false,
     }),
+    pink: new THREE.MeshBasicMaterial({
+        color: 0xff1493,
+        wireframe: false,
+        side: THREE.DoubleSide,
+    }),
 };
 
 const BASE_H_ROPE = 5;
@@ -67,7 +72,7 @@ let dimensions = {
     cTrolley: 6,
     lClawBase: 3,
     hClawBase: 2,
-    lClaw: 0,
+    lClaw: 2,
     hClaw: 0,
     rRope: 0.5,
     hRope: BASE_H_ROPE,
@@ -549,12 +554,77 @@ function createClaw(x, y, z) {
     // Referencial Bisneto: Pinças da garra
     claw.add(new THREE.AxesHelper(10));
     // Posições relativas ao novo referencial
-    // addClawFinger(claw, 0, 0, 0);
+    addClawFinger(claw, 0, 0, 0, 0);
+    addClawFinger(claw, 0, 0, 0, Math.PI);
+    addClawFinger(claw, 0, 0, 0, Math.PI/2);
+    addClawFinger(claw, 0, 0, 0, -Math.PI/2);
 
     claw.position.set(x, y, z);
 }
 
-function addClawFinger(obj, x, y, z) {}
+function addClawFinger(obj, x, y, z, rot) {
+    "use strict";
+    let scaler = 0.4;
+    
+    geometry = new THREE.BufferGeometry();
+    let vertices = new Float32Array([
+        0, 0, 0,        // 0
+        0, -2, 0,       // 1
+        5, -5, 0,       // 2
+        3.5, -5, 0,     // 3
+        3, -10, 0,      // 4
+        1, -12, 0,      // 5
+        0, 0, 2,        // 6 - 0
+        0, -2, 2,       // 7 - 1
+        5, -5, 2,       // 8 - 2
+        3.5, -5, 2,     // 9 - 3
+        3, -10, 2,      // 10 - 4
+        3, -10, 2,      // 11 - 5
+    ]);
+
+    const indices = [
+        // 0-1-6-7 Square
+        0, 1, 6,
+        1, 6, 7,
+        // 0-1-2-3 Rectangle
+        0, 1, 2,
+        1, 2, 3,
+        // 0-2-6-8 Rectangle
+        0, 2, 6,
+        2, 6, 8,
+        // 1-3-7-9 Rectangle
+        1, 3, 7,
+        3, 7, 9,
+        // 2-3-8-9 Square
+        2, 3, 8,
+        3, 8, 9,
+        // 2-3-4-5 Rectangle
+        2, 3, 4,
+        3, 4, 5,
+        // 8-9-10-11 Rectangle
+        8, 9, 10,
+        9, 10, 11,
+        // 3-5-9-11 Rectangle
+        3, 5, 9,
+        5, 9, 11,
+        // 4-5-10-11 Square
+        4, 5, 10,
+        5, 10, 11,
+    ];
+
+    vertices = vertices.map(function(x) {return x * scaler});
+    
+    geometry.setIndex(indices);
+    geometry.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(vertices, 3)
+    );
+    geometry.rotateY(rot);
+
+    mesh = new THREE.Mesh(geometry, materials.pink);
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
 
 function createCrates() {
     "use strict";
