@@ -3,6 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { VRButton } from "three/addons/webxr/VRButton.js";
 import * as Stats from "three/addons/libs/stats.module.js";
 import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+//import { convertArray } from "three/src/animation/AnimationUtils";
 
 //////////////////////
 /* GLOBAL VARIABLES */
@@ -20,6 +21,8 @@ let scene, renderer, geometry, mesh;
 
 let crane, lowerCrane, upperCrane, trolley, claw;
 
+let crate1, crate2, crate3, container;
+
 let materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
     darkOrange: new THREE.MeshBasicMaterial({
@@ -32,6 +35,14 @@ let materials = {
     }),
     lightBlue: new THREE.MeshBasicMaterial({
         color: 0x85e6fc,
+        wireframe: false,
+    }),
+    redBrown: new THREE.MeshBasicMaterial({
+        color: 0xa52a2a,
+        wireframe: false,
+    }),
+    coffeeBrown: new THREE.MeshBasicMaterial({
+        color: 0x6f4e37,
         wireframe: false,
     }),
 };
@@ -68,6 +79,7 @@ let pressedKeys = {
     3: false,
     4: false,
     5: false,
+    6: false,
     q: false,
     a: false,
     w: false,
@@ -109,8 +121,8 @@ function createScene() {
     //scene.add(new THREE.AxesHelper(10));
 
     createCrane();
-    // createCrates()
-    // createContainer()
+    createContainer();
+    createCrates();
 }
 
 //////////////////////
@@ -175,15 +187,23 @@ function createTopCamera() {
 
 function createClawCamera() {
     "use strict";
-    clawCamera = new THREE.PerspectiveCamera(
-        70,
-        window.innerWidth / window.innerHeight,
+    let aspectRatio = window.innerWidth / window.innerHeight;
+    let viewSize = 70;
+    clawCamera = new THREE.OrthographicCamera(
+        (aspectRatio * viewSize) / -2,
+        (aspectRatio * viewSize) / 2,
+        viewSize / 2,
+        viewSize / -2,
         1,
         1000
     );
     // TODO
-    clawCamera.position.set(50, 50, 50);
-    clawCamera.lookAt(scene.position);
+    let heightUpperTower = dimensions.hBase + dimensions.hTower;
+    let heightTrolley = dimensions.hDifference;
+
+    clawCamera.position.set(100, 0, 0);
+    //clawCamera.position.set(trolleyX, heightUpperTower+heightTrolley, 0);
+    clawCamera.lookAt(0, 0, 0);
 }
 
 function createBroadPerpectiveCamera() {
@@ -324,8 +344,6 @@ function createUpperCrane(x, y, z) {
     //addTurntable(upperCrane, x, y, z);
 
     upperCrane.position.set(x, y, z);
-
-    upperCrane.rotateY(0);
 }
 
 function addSuperiorTowerPeak(obj, x, y, z) {
@@ -464,14 +482,98 @@ function createClaw(x, y, z) {
     claw = new THREE.Object3D();
     // Referencial Bisneto: Pinças da garra
     claw.add(new THREE.AxesHelper(10));
-
     // Posições relativas ao novo referencial
     // addClawFinger(claw, 0, 0, 0);
 
     claw.position.set(x, y, z);
+
+    //claw.add(clawCamera);
 }
 
-function createCrates() {}
+function createCrates() {
+    "use strict";
+    crate1 = new THREE.Object3D();
+
+    let pos = new THREE.Vector3(20, 0, -10);
+    let dim = new THREE.Vector3(5, 5, 5);
+    let rot = 1;
+    addCrate(crate1, pos, dim, rot, materials.coffeeBrown);
+
+    crate2 = new THREE.Object3D();
+
+    pos = new THREE.Vector3(10, 0, -20);
+    dim = new THREE.Vector3(5, 5, 5);
+    rot = 0;
+    addCrate(crate2, pos, dim, rot, materials.redBrown);
+
+    crate3 = new THREE.Object3D();
+
+    pos = new THREE.Vector3(-30, 0, -10);
+    dim = new THREE.Vector3(10, 20, 5);
+    rot = 1.7
+    addCrate(crate3, pos, dim, rot, materials.redBrown);
+
+    scene.add(crate1);
+    scene.add(crate2);
+    scene.add(crate3);
+}
+
+function addCrate(obj, pos, dim, rot, color) {
+    "use strict";
+    geometry = new THREE.BoxGeometry(dim.x, dim.y, dim.z);
+    mesh = new THREE.Mesh(geometry, color);
+    mesh.rotation.y = rot;
+    mesh.position.set(pos.x, pos.y + dim.y / 2, pos.z);
+    obj.add(mesh);
+}
+
+function createContainer() {
+    "use strict";
+    container = new THREE.Object3D();
+    let lContainer = 80;
+    let hContainer = 10;
+    let cContainer = 60;
+    let thickness = 1;
+
+    // X Walls
+    let pos = new THREE.Vector3(-50, 0, -30);
+    let dim = new THREE.Vector3(lContainer, hContainer, thickness);
+    let rot = 0;
+    addWall(container, pos, dim, rot, materials.coffeeBrown);
+
+    pos = new THREE.Vector3(-50, 0, 30);
+    dim = new THREE.Vector3(lContainer, hContainer, thickness);
+    rot = 0;
+    addWall(container, pos, dim, rot, materials.coffeeBrown);
+
+    // Z Walls
+    pos = new THREE.Vector3(-10.5, 0, 0);
+    dim = new THREE.Vector3(cContainer, hContainer, thickness);
+    rot = Math.PI / 2;
+    addWall(container, pos, dim, rot, materials.coffeeBrown);
+
+    pos = new THREE.Vector3(-89.5, 0, 0);
+    dim = new THREE.Vector3(cContainer, hContainer, thickness);
+    rot = Math.PI / 2;
+    addWall(container, pos, dim, rot, materials.coffeeBrown);
+
+    // Floor
+    pos = new THREE.Vector3(-50, 0, 0);
+    dim = new THREE.Vector3(lContainer-1, thickness, cContainer);
+    rot = 0;
+    addWall(container, pos, dim, rot, materials.grey);
+
+    scene.add(container);
+}
+
+function addWall(obj, pos, dim, rot, color) {
+    "use strict";
+    geometry = new THREE.BoxGeometry(dim.x, dim.y, dim.z);
+    mesh = new THREE.Mesh(geometry, color);
+    mesh.rotation.y = rot;
+    mesh.position.set(pos.x, pos.y + dim.y / 2, pos.z);
+    obj.add(mesh);
+}
 
 //////////////////////
 /* CHECK COLLISIONS */
@@ -515,6 +617,19 @@ function update() {
     clawY = Math.min(clawY, MAX_CLAW_Y);
     clawY = Math.max(clawY, MIN_CLAW_Y);
     claw.position.y = clawY;
+
+    //updateClawCamera(trolleyX, clawY, 0);
+}
+
+function updateClawCamera(x, y, z) {
+    // TODO
+    let height = dimensions.hBase + dimensions.hTower + dimensions.hDifference;
+
+    //clawCamera.position.set(trolleyX, heightUpperTower+heightTrolley, 0);
+    clawCamera.lookAt(0, 0, 0);
+
+    clawCamera.position.set(x, y + height, z);
+    clawCamera.lookAt(0, 0, 0);
 }
 
 /////////////
