@@ -691,21 +691,27 @@ function keyUpdate() {
                         materials[material].wireframe =
                             !materials[material].wireframe;
                     }
+                    pressedKeys[key] = false;
                     break;
                 case "2":
                     currCamera = lateralCamera;
+                    pressedKeys[key] = false;
                     break;
                 case "3":
                     currCamera = topCamera;
+                    pressedKeys[key] = false;
                     break;
                 case "4":
                     currCamera = broadOCamera;
+                    pressedKeys[key] = false;
                     break;
                 case "5":
                     currCamera = broadPCamera;
+                    pressedKeys[key] = false;
                     break;
                 case "6":
                     currCamera = clawCamera;
+                    pressedKeys[key] = false;
                     break;
                 case "q":
                     towerAngle += scaler * 0.1;
