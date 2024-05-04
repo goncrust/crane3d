@@ -676,12 +676,25 @@ function update() {
     claw.position.y = clawY;
 
     updateClawCamera();
+
+    updateHUD();
 }
 
 function updateClawCamera() {
+    "use strict";
     let clawWorldPosition = claw.position.clone();
     clawWorldPosition.applyMatrix4(claw.matrixWorld);
     clawCamera.lookAt(clawWorldPosition.x, 0, clawWorldPosition.z);
+}
+
+function updateHUD() {
+    "use strict";
+    for (const key in pressedKeys) {
+        let domElement = document.getElementById(key);
+        if (!!domElement) {
+            domElement.className = pressedKeys[key] ? "active" : "";
+        }
+    }
 }
 
 /////////////
