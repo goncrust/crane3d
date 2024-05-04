@@ -3,6 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { VRButton } from "three/addons/webxr/VRButton.js";
 import * as Stats from "three/addons/libs/stats.module.js";
 import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+//import { convertArray } from "three/src/animation/AnimationUtils";
 
 //////////////////////
 /* GLOBAL VARIABLES */
@@ -20,6 +21,8 @@ let scene, renderer, geometry, mesh;
 
 let crane, lowerCrane, upperCrane, trolley, claw;
 
+let crate1, crate2, crate3, container;
+
 let materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
     darkOrange: new THREE.MeshBasicMaterial({
@@ -32,6 +35,14 @@ let materials = {
     }),
     lightBlue: new THREE.MeshBasicMaterial({
         color: 0x85e6fc,
+        wireframe: false,
+    }),
+    redBrown: new THREE.MeshBasicMaterial({
+        color: 0xa52a2a,
+        wireframe: false,
+    }),
+    coffeeBrown: new THREE.MeshBasicMaterial({
+        color: 0x6f4e37,
         wireframe: false,
     }),
 };
@@ -114,30 +125,39 @@ const BIND_INFORMATION = [
 ];
 
 let pressedKeys = {
-    '1': false,
-    '2': false,
-    '3': false,
-    '4': false,
-    '5': false,
-    'q': false,
-    'a': false,
-    'w': false,
-    's': false,
-    'e': false,
-    'd': false,
+    1: false,
+    2: false,
+    3: false,
+    4: false,
+    5: false,
+    6: false,
+    q: false,
+    a: false,
+    w: false,
+    s: false,
+    e: false,
+    d: false,
 };
 
-const MAX_TROLLEY_X = dimensions.cJib + dimensions.lTower / 2 - dimensions.cTrolley / 2;
+const MAX_TROLLEY_X =
+    dimensions.cJib + dimensions.lTower / 2 - dimensions.cTrolley / 2;
 const MIN_TROLLEY_X = dimensions.lTower / 2 + dimensions.cTrolley / 2;
 
 const MIN_ROPE_SCALE = 0;
-const MAX_ROPE_SCALE = (dimensions.hTower + dimensions.hDifference - dimensions.hTrolley) / BASE_H_ROPE;
+const MAX_ROPE_SCALE =
+    (dimensions.hTower + dimensions.hDifference - dimensions.hTrolley) /
+    BASE_H_ROPE;
 
 const Y_AXIS = new THREE.Vector3(0, 1, 0);
 const MIN_TOWER_ANGLE = 0;
 const MAX_TOWER_ANGLE = Math.PI;
 
-let ropeScale, trolleyX, towerAngle;
+const MAX_CLAW_Y = -dimensions.hTrolley - dimensions.hClawBase;
+
+const MIN_CLAW_Y =
+    -dimensions.hDifference - dimensions.hTower - dimensions.hClawBase;
+
+let ropeScale, trolleyX, towerAngle, clawY;
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -152,6 +172,8 @@ function createScene() {
     //scene.add(new THREE.AxesHelper(10));
 
     createCrane();
+    createContainer();
+    createCrates();
 }
 
 //////////////////////
@@ -222,9 +244,7 @@ function createClawCamera() {
         1,
         1000,
     );
-    // TODO
-    clawCamera.position.set(50, 50, 50);
-    clawCamera.lookAt(scene.position);
+    claw.add(clawCamera);
 }
 
 function createBroadPerpectiveCamera() {
@@ -284,6 +304,7 @@ function createCrane() {
     ropeScale = 1;
     trolleyX = dimensions.cJib / 2;
     towerAngle = 0;
+    clawY = -dimensions.hRope - dimensions.hTrolley - dimensions.hClawBase;
 
     crane = new THREE.Object3D();
 
@@ -296,8 +317,8 @@ function createCrane() {
     createTrolley(trolleyX, heightTrolley, 0);
     upperCrane.add(trolley);
 
-    // createClaw(0, -(dimensions.hTrolley + dimensions.hRope), 0);
-    // trolley.add(claw);
+    createClaw(0, clawY, 0);
+    trolley.add(claw);
 
     scene.add(crane);
 }
@@ -380,14 +401,12 @@ function createUpperCrane(x, y, z) {
     //addTurntable(upperCrane, x, y, z);
 
     upperCrane.position.set(x, y, z);
-
-    upperCrane.rotateY(0);
 }
 
 function addSuperiorTowerPeak(obj, x, y, z) {
     "use strict";
     geometry = new THREE.ConeGeometry(
-        dimensions.lTower * Math.sqrt(2) / 2,
+        (dimensions.lTower * Math.sqrt(2)) / 2,
         dimensions.hSuperiorTowerPeak,
         4,
     ).rotateY(3.925);
@@ -466,7 +485,12 @@ function createTrolley(x, y, z) {
     // Posições relativas ao novo referencial
     addTrolley(trolley, 0, -dimensions.hTrolley / 2, 0);
     addRope(trolley, 0, -(dimensions.hTrolley + dimensions.hRope / 2), 0);
-    addClawBase(trolley, 0, -(dimensions.hTrolley + dimensions.hRope + dimensions.hClawBase / 2), 0);
+    addClawBase(
+        trolley,
+        0,
+        -(dimensions.hTrolley + dimensions.hRope + dimensions.hClawBase / 2),
+        0,
+    );
 
     trolley.position.set(x, y, z);
 }
@@ -492,7 +516,7 @@ function addRope(obj, x, y, z) {
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
-    mesh.name = 'rope';
+    mesh.name = "rope";
     obj.add(mesh);
 }
 
@@ -505,7 +529,7 @@ function addClawBase(obj, x, y, z) {
     );
     mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
-    mesh.name = 'clawBase';
+    mesh.name = "clawBase";
     obj.add(mesh);
 }
 
@@ -515,10 +539,97 @@ function createClaw(x, y, z) {
     claw = new THREE.Object3D();
     // Referencial Bisneto: Pinças da garra
     claw.add(new THREE.AxesHelper(10));
-
     // Posições relativas ao novo referencial
+    // addClawFinger(claw, 0, 0, 0);
 
     claw.position.set(x, y, z);
+}
+
+function addClawFinger(obj, x, y, z) {}
+
+function createCrates() {
+    "use strict";
+    crate1 = new THREE.Object3D();
+
+    let pos = new THREE.Vector3(20, 0, -10);
+    let dim = new THREE.Vector3(5, 5, 5);
+    let rot = 1;
+    addCrate(crate1, pos, dim, rot, materials.coffeeBrown);
+
+    crate2 = new THREE.Object3D();
+
+    pos = new THREE.Vector3(10, 0, -20);
+    dim = new THREE.Vector3(5, 5, 5);
+    rot = 0;
+    addCrate(crate2, pos, dim, rot, materials.redBrown);
+
+    crate3 = new THREE.Object3D();
+
+    pos = new THREE.Vector3(-30, 0, -10);
+    dim = new THREE.Vector3(10, 20, 5);
+    rot = 1.7;
+    addCrate(crate3, pos, dim, rot, materials.redBrown);
+
+    scene.add(crate1);
+    scene.add(crate2);
+    scene.add(crate3);
+}
+
+function addCrate(obj, pos, dim, rot, color) {
+    "use strict";
+    geometry = new THREE.BoxGeometry(dim.x, dim.y, dim.z);
+    mesh = new THREE.Mesh(geometry, color);
+    mesh.rotation.y = rot;
+    mesh.position.set(pos.x, pos.y + dim.y / 2, pos.z);
+    obj.add(mesh);
+}
+
+function createContainer() {
+    "use strict";
+    container = new THREE.Object3D();
+    let lContainer = 80;
+    let hContainer = 10;
+    let cContainer = 60;
+    let thickness = 1;
+
+    // X Walls
+    let pos = new THREE.Vector3(-50, 0, -30);
+    let dim = new THREE.Vector3(lContainer, hContainer, thickness);
+    let rot = 0;
+    addWall(container, pos, dim, rot, materials.coffeeBrown);
+
+    pos = new THREE.Vector3(-50, 0, 30);
+    dim = new THREE.Vector3(lContainer, hContainer, thickness);
+    rot = 0;
+    addWall(container, pos, dim, rot, materials.coffeeBrown);
+
+    // Z Walls
+    pos = new THREE.Vector3(-10.5, 0, 0);
+    dim = new THREE.Vector3(cContainer, hContainer, thickness);
+    rot = Math.PI / 2;
+    addWall(container, pos, dim, rot, materials.coffeeBrown);
+
+    pos = new THREE.Vector3(-89.5, 0, 0);
+    dim = new THREE.Vector3(cContainer, hContainer, thickness);
+    rot = Math.PI / 2;
+    addWall(container, pos, dim, rot, materials.coffeeBrown);
+
+    // Floor
+    pos = new THREE.Vector3(-50, 0, 0);
+    dim = new THREE.Vector3(lContainer - 1, thickness, cContainer);
+    rot = 0;
+    addWall(container, pos, dim, rot, materials.grey);
+
+    scene.add(container);
+}
+
+function addWall(obj, pos, dim, rot, color) {
+    "use strict";
+    geometry = new THREE.BoxGeometry(dim.x, dim.y, dim.z);
+    mesh = new THREE.Mesh(geometry, color);
+    mesh.rotation.y = rot;
+    mesh.position.set(pos.x, pos.y + dim.y / 2, pos.z);
+    obj.add(mesh);
 }
 
 //////////////////////
@@ -551,10 +662,26 @@ function update() {
     ropeScale = Math.min(ropeScale, MAX_ROPE_SCALE);
     ropeScale = Math.max(ropeScale, MIN_ROPE_SCALE);
     dimensions.hRope = BASE_H_ROPE * ropeScale;
-    let rope = trolley.getObjectByName('rope');
+    let rope = trolley.getObjectByName("rope");
     rope.scale.y = ropeScale;
     rope.position.y = -(dimensions.hTrolley + dimensions.hRope / 2);
-    trolley.getObjectByName('clawBase').position.y = -(dimensions.hTrolley + dimensions.hRope + dimensions.hClawBase / 2);
+    trolley.getObjectByName("clawBase").position.y = -(
+        dimensions.hTrolley +
+        dimensions.hRope +
+        dimensions.hClawBase / 2
+    );
+
+    clawY = Math.min(clawY, MAX_CLAW_Y);
+    clawY = Math.max(clawY, MIN_CLAW_Y);
+    claw.position.y = clawY;
+
+    updateClawCamera();
+}
+
+function updateClawCamera() {
+    let clawWorldPosition = claw.position.clone();
+    clawWorldPosition.applyMatrix4(claw.matrixWorld);
+    clawCamera.lookAt(clawWorldPosition.x, 0, clawWorldPosition.z);
 }
 
 /////////////
@@ -630,45 +757,48 @@ function onKeyDown(e) {
     for (const key in pressedKeys) {
         if (pressedKeys[key]) {
             switch (key) {
-                case '1':
+                case "1":
                     currCamera = frontalCamera;
                     for (let material in materials) {
-                        materials[material].wireframe = !materials[material].wireframe;
+                        materials[material].wireframe =
+                            !materials[material].wireframe;
                     }
                     break;
-                case '2':
+                case "2":
                     currCamera = lateralCamera;
                     break;
-                case '3':
+                case "3":
                     currCamera = topCamera;
                     break;
-                case '4':
+                case "4":
                     currCamera = broadOCamera;
                     break;
-                case '5':
+                case "5":
                     currCamera = broadPCamera;
                     break;
-                case '6':
+                case "6":
                     currCamera = clawCamera;
                     break;
-                case 'q':
+                case "q":
                     towerAngle += 0.1;
                     break;
-                case 'a':
+                case "a":
                     towerAngle -= 0.1;
                     break;
-                case 'w':
+                case "w":
                     trolleyX += 1;
                     break;
-                case 's':
+                case "s":
                     trolleyX -= 1;
                     break;
-                case 'e':
+                case "e":
+                    ropeScale -= 0.2;
+                    clawY += 1;
+                    break;
+                case "d":
                     console.log(trolley);
                     ropeScale += 0.2;
-                    break;
-                case 'd':
-                    ropeScale -= 0.2;
+                    clawY -= 1;
                     break;
             }
         }
