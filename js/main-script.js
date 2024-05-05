@@ -565,7 +565,7 @@ function createClaw(x, y, z) {
 function addClawFinger(obj, x, y, z, rot) {
     "use strict";
     let scaler = 0.4;
-    
+
     geometry = new THREE.BufferGeometry();
     let vertices = new Float32Array([
         0, 0, 0,        // 0
@@ -613,7 +613,7 @@ function addClawFinger(obj, x, y, z, rot) {
     ];
 
     vertices = vertices.map(function(x) {return x * scaler});
-    
+
     geometry.setIndex(indices);
     geometry.setAttribute(
         "position",
@@ -900,7 +900,8 @@ function onKeyDown(e) {
     if (!pressedKeys.hasOwnProperty(e.key)) {
         return;
     }
-    pressedKeys[e.key] = true;
+
+    pressedKeys[e.key] = isFinite(e.key) ? !e.repeat : true;
 }
 
 ///////////////////////
@@ -911,6 +912,7 @@ function onKeyUp(e) {
     if (!pressedKeys.hasOwnProperty(e.key)) {
         return;
     }
+
     pressedKeys[e.key] = false;
 }
 
