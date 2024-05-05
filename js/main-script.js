@@ -805,10 +805,10 @@ function update() {
     fingerAngle = Math.min(fingerAngle, MAX_FINGER_ANGLE);
     fingerAngle = Math.max(fingerAngle, MIN_FINGER_ANGLE);
     // TODO: Atualizar estes índices quando removermos o axes helper
-    claw.children[1].setRotationFromAxisAngle(X_AXIS, fingerAngle);
-    claw.children[2].setRotationFromAxisAngle(X_AXIS, -fingerAngle);
-    claw.children[3].setRotationFromAxisAngle(Z_AXIS, fingerAngle);
-    claw.children[4].setRotationFromAxisAngle(Z_AXIS, -fingerAngle);
+    claw.children[1].setRotationFromAxisAngle(Z_AXIS, fingerAngle);
+    claw.children[2].setRotationFromAxisAngle(Z_AXIS, -fingerAngle);
+    claw.children[3].setRotationFromAxisAngle(X_AXIS, fingerAngle);
+    claw.children[4].setRotationFromAxisAngle(X_AXIS, -fingerAngle);
 
     const delta = clock.getDelta();
     trolleyAnimationMixer.update(delta);
