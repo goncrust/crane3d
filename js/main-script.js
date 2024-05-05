@@ -182,7 +182,7 @@ const MAX_FINGER_ANGLE = Math.PI / 3;
 let ropeScale, trolleyX, towerAngle, clawY, fingerAngle;
 
 const clock = new THREE.Clock();
-let forwardAnimationKF, forwardAnimationClip, trolleyAnimationMixer, trolleyAction;
+let trolleyMixer, clawFingerMixers = [];
 let isAnimating = false;
 
 /////////////////////
@@ -529,7 +529,7 @@ function createTrolley(x, y, z) {
     );
 
     trolley.position.set(x, y, z);
-    trolleyAnimationMixer = new THREE.AnimationMixer(trolley);
+    trolleyMixer = new THREE.AnimationMixer(trolley);
 }
 
 function addTrolley(obj, x, y, z) {
@@ -649,6 +649,9 @@ function addClawFinger(obj, x, y, z, rot) {
 
     mesh = new THREE.Mesh(geometry, materials.pink);
     mesh.position.set(x, y, z);
+
+    clawFingerMixers.push(new THREE.AnimationMixer(mesh));
+
     obj.add(mesh);
 }
 
@@ -749,15 +752,17 @@ function addWall(obj, pos, dim, rot, color) {
 //////////////////////
 function checkCollisions() {
     "use strict";
+    if (isAnimating) return;
     let clawBoundingSphere = new THREE.Sphere();
     clawBoundingBox.setFromObject(claw, true);
     clawBoundingBox.getBoundingSphere(clawBoundingSphere);
 
     for (const bound of crateBounds) {
         if (clawBoundingSphere.intersectsSphere(bound.sphere)) {
-            isAnimating = true;
-        } else if (clawBoundingBox.intersectsBox(bound.box)) {
-            isAnimating = true;
+            if (clawBoundingBox.intersectsBox(bound.box)) {
+                isAnimating = true;
+                handleCollisions();
+            }
         }
     }
 }
@@ -767,6 +772,53 @@ function checkCollisions() {
 ///////////////////////
 function handleCollisions() {
     "use strict";
+    const quaternions = [
+        (new THREE.Quaternion()).setFromAxisAngle(Z_AXIS, MAX_FINGER_ANGLE),
+        (new THREE.Quaternion()).setFromAxisAngle(Z_AXIS, -MAX_FINGER_ANGLE),
+        (new THREE.Quaternion()).setFromAxisAngle(X_AXIS, MAX_FINGER_ANGLE),
+        (new THREE.Quaternion()).setFromAxisAngle(X_AXIS, -MAX_FINGER_ANGLE),
+    ];
+
+    for (let i = 0; i < clawFingerMixers.length; i++) {
+        console.log("entrou");
+        animateClawFinger(claw.children[i+1], clawFingerMixers[i], quaternions[i]);
+    }
+
+    animateTrolley();
+}
+
+function animateClawFinger(finger, mixer, max_quaternion) {
+    "use strict";
+    const times = [0, 2];
+    const values = [
+        ...finger.quaternion.toArray(),
+        ...max_quaternion.toArray(),
+    ];
+
+    const openClawFingerKF = new THREE.QuaternionKeyframeTrack(".quaternion", times, values);
+    const openClawFingerClip = new THREE.AnimationClip("open-claw", -1, [openClawFingerKF]);
+    const openClawFingerAction = mixer.clipAction(openClawFingerClip);
+    openClawFingerAction.setLoop(THREE.LoopOnce);
+    openClawFingerAction.play();
+}
+
+function animateTrolley() {
+    "use strict";
+    const times = [0, 2];
+    const values = [
+        trolley.position.x,
+        trolley.position.y,
+        trolley.position.z,
+        MAX_TROLLEY_X,
+        trolley.position.y,
+        trolley.position.z,
+    ];
+
+    const moveTrolleyKF = new THREE.VectorKeyframeTrack(".position", times, values);
+    const moveTrolleyClip = new THREE.AnimationClip("forward", -1, [moveTrolleyKF]);
+    const moveTrolleyAction = trolleyMixer.clipAction(moveTrolleyClip);
+    moveTrolleyAction.setLoop(THREE.LoopOnce);
+    moveTrolleyAction.play();
 }
 
 ////////////
@@ -811,7 +863,10 @@ function update() {
     claw.children[4].setRotationFromAxisAngle(X_AXIS, -fingerAngle);
 
     const delta = clock.getDelta();
-    trolleyAnimationMixer.update(delta);
+    for (const mixer of clawFingerMixers) {
+        mixer.update(delta);
+    }
+    trolleyMixer.update(delta);
 
     checkCollisions();
 }
@@ -849,33 +904,36 @@ function keyUpdate() {
                     currCamera = clawCamera;
                     pressedKeys[key] = false;
                     break;
-                case "q":
-                    towerAngle += scaler * 0.1;
-                    break;
-                case "a":
-                    towerAngle -= scaler * 0.1;
-                    break;
-                case "w":
-                    animateTrolley();
-                    trolleyX += scaler * 1;
-                    break;
-                case "s":
-                    trolleyX -= scaler * 1;
-                    break;
-                case "e":
-                    ropeScale -= scaler * 0.2;
-                    clawY += scaler * 1;
-                    break;
-                case "d":
-                    ropeScale += scaler * 0.2;
-                    clawY -= scaler * 1;
-                    break;
-                case "r":
-                    fingerAngle += scaler * 0.1;
-                    break;
-                case "f":
-                    fingerAngle -= scaler * 0.1;
-                    break;
+            }
+            if (!isAnimating) {
+                switch (key) {
+                    case "q":
+                        towerAngle += scaler * 0.1;
+                        break;
+                    case "a":
+                        towerAngle -= scaler * 0.1;
+                        break;
+                    case "w":
+                        trolleyX += scaler * 1;
+                        break;
+                    case "s":
+                        trolleyX -= scaler * 1;
+                        break;
+                    case "e":
+                        ropeScale -= scaler * 0.2;
+                        clawY += scaler * 1;
+                        break;
+                    case "d":
+                        ropeScale += scaler * 0.2;
+                        clawY -= scaler * 1;
+                        break;
+                    case "r":
+                        fingerAngle += scaler * 0.1;
+                        break;
+                    case "f":
+                        fingerAngle -= scaler * 0.1;
+                        break;
+                }
             }
         }
     }
@@ -933,29 +991,6 @@ function render() {
 ////////////////////////////////
 /* INITIALIZE ANIMATION CYCLE */
 ////////////////////////////////
-
-function animateTrolley() {
-    "use strict";
-    const times = [0, 2, 4];
-    const values = [
-        trolley.position.x,
-        trolley.position.y,
-        trolley.position.z,
-        MAX_TROLLEY_X,
-        trolley.position.y,
-        trolley.position.z,
-        trolley.position.x,
-        trolley.position.y,
-        trolley.position.z,
-    ];
-
-    forwardAnimationKF = new THREE.VectorKeyframeTrack(".position", times, values);
-    forwardAnimationClip = new THREE.AnimationClip("forward", -1, [forwardAnimationKF]);
-    trolleyAction = trolleyAnimationMixer.clipAction(forwardAnimationClip);
-    trolleyAction.setLoop(THREE.LoopOnce);
-    trolleyAction.play();
-}
-
 function init() {
     "use strict";
     renderer = new THREE.WebGLRenderer({
