@@ -181,6 +181,8 @@ const MAX_FINGER_ANGLE = Math.PI / 3;
 
 let ropeScale, trolleyX, towerAngle, clawY, fingerAngle;
 
+const clock = new THREE.Clock();
+let forwardAnimationKF, forwardAnimationClip, trolleyAnimationMixer, trolleyAction;
 let isAnimating = false;
 
 /////////////////////
@@ -527,6 +529,7 @@ function createTrolley(x, y, z) {
     );
 
     trolley.position.set(x, y, z);
+    trolleyAnimationMixer = new THREE.AnimationMixer(trolley);
 }
 
 function addTrolley(obj, x, y, z) {
@@ -807,6 +810,9 @@ function update() {
     claw.children[3].setRotationFromAxisAngle(Z_AXIS, fingerAngle);
     claw.children[4].setRotationFromAxisAngle(Z_AXIS, -fingerAngle);
 
+    const delta = clock.getDelta();
+    trolleyAnimationMixer.update(delta);
+
     checkCollisions();
 }
 
@@ -850,6 +856,7 @@ function keyUpdate() {
                     towerAngle -= scaler * 0.1;
                     break;
                 case "w":
+                    animateTrolley();
                     trolleyX += scaler * 1;
                     break;
                 case "s":
@@ -926,6 +933,29 @@ function render() {
 ////////////////////////////////
 /* INITIALIZE ANIMATION CYCLE */
 ////////////////////////////////
+
+function animateTrolley() {
+    "use strict";
+    const times = [0, 2, 4];
+    const values = [
+        trolley.position.x,
+        trolley.position.y,
+        trolley.position.z,
+        MAX_TROLLEY_X,
+        trolley.position.y,
+        trolley.position.z,
+        trolley.position.x,
+        trolley.position.y,
+        trolley.position.z,
+    ];
+
+    forwardAnimationKF = new THREE.VectorKeyframeTrack(".position", times, values);
+    forwardAnimationClip = new THREE.AnimationClip("forward", -1, [forwardAnimationKF]);
+    trolleyAction = trolleyAnimationMixer.clipAction(forwardAnimationClip);
+    trolleyAction.setLoop(THREE.LoopOnce);
+    trolleyAction.play();
+}
+
 function init() {
     "use strict";
     renderer = new THREE.WebGLRenderer({
