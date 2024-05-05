@@ -129,6 +129,14 @@ const BIND_INFORMATION = [
         key: "d",
         description: "Move claw down",
     },
+    {
+        key: "r",
+        description: "Open claw",
+    },
+    {
+        key: "f",
+        description: "Close claw",
+    },
 ];
 
 let pressedKeys = {
@@ -144,6 +152,8 @@ let pressedKeys = {
     s: false,
     e: false,
     d: false,
+    r: false,
+    f: false,
 };
 
 const MAX_TROLLEY_X =
@@ -164,7 +174,12 @@ const MAX_CLAW_Y = -dimensions.hTrolley - dimensions.hClawBase;
 const MIN_CLAW_Y =
     -dimensions.hDifference - dimensions.hTower - dimensions.hClawBase;
 
-let ropeScale, trolleyX, towerAngle, clawY;
+const X_AXIS = new THREE.Vector3(1, 0, 0);
+const Z_AXIS = new THREE.Vector3(0, 0, 1);
+const MIN_FINGER_ANGLE = 0;
+const MAX_FINGER_ANGLE = Math.PI / 2;
+
+let ropeScale, trolleyX, towerAngle, clawY, fingerAngle;
 
 let isAnimating = false;
 
@@ -323,6 +338,7 @@ function createCrane() {
     trolleyX = dimensions.cJib / 2;
     towerAngle = 0;
     clawY = -dimensions.hRope - dimensions.hTrolley - dimensions.hClawBase;
+    fingerAngle = 0;
 
     crane = new THREE.Object3D();
 
@@ -777,6 +793,14 @@ function update() {
     clawY = Math.max(clawY, MIN_CLAW_Y);
     claw.position.y = clawY;
 
+    fingerAngle = Math.min(fingerAngle, MAX_FINGER_ANGLE);
+    fingerAngle = Math.max(fingerAngle, MIN_FINGER_ANGLE);
+    // TODO: Atualizar estes índices quando removermos o axes helper
+    claw.children[1].setRotationFromAxisAngle(X_AXIS, fingerAngle);
+    claw.children[2].setRotationFromAxisAngle(X_AXIS, -fingerAngle);
+    claw.children[3].setRotationFromAxisAngle(Z_AXIS, fingerAngle);
+    claw.children[4].setRotationFromAxisAngle(Z_AXIS, -fingerAngle);
+
     checkCollisions();
 }
 
@@ -832,6 +856,12 @@ function keyUpdate() {
                 case "d":
                     ropeScale += scaler * 0.2;
                     clawY -= scaler * 1;
+                    break;
+                case "r":
+                    fingerAngle += scaler * 0.1;
+                    break;
+                case "f":
+                    fingerAngle -= scaler * 0.1;
                     break;
             }
         }
