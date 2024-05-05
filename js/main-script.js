@@ -21,7 +21,7 @@ let scene, renderer, geometry, mesh;
 
 let crane, lowerCrane, upperCrane, trolley, claw;
 
-let clawBoundingBox, crateBoundingBoxes = [];
+let clawBoundingBox, crateBounds = [];
 
 let crate1, crate2, crate3, container;
 
@@ -686,9 +686,11 @@ function addCrate(obj, pos, dim, rot, color) {
     mesh.geometry.computeBoundingBox();
     obj.add(mesh);
 
+    let crateBoundingSphere = new THREE.Sphere();
     const crateBoundingBox = new THREE.Box3();
     crateBoundingBox.setFromObject(mesh, true);
-    crateBoundingBoxes.push(crateBoundingBox);
+    crateBoundingBox.getBoundingSphere(crateBoundingSphere);
+    crateBounds.push({box: crateBoundingBox, sphere: crateBoundingSphere});
 }
 
 function createContainer() {
@@ -744,12 +746,16 @@ function addWall(obj, pos, dim, rot, color) {
 //////////////////////
 function checkCollisions() {
     "use strict";
-        clawBoundingBox.setFromObject(claw, true);
+    let clawBoundingSphere = new THREE.Sphere();
+    clawBoundingBox.setFromObject(claw, true);
+    clawBoundingBox.getBoundingSphere(clawBoundingSphere);
 
-        for (const crate of crateBoundingBoxes) {
-            if (clawBoundingBox.intersectsBox(crate)) {
-                isAnimating = true;
-            }
+    for (const bound of crateBounds) {
+        if (clawBoundingSphere.intersectsSphere(bound.sphere)) {
+            isAnimating = true;
+        } else if (clawBoundingBox.intersectsBox(bound.box)) {
+            isAnimating = true;
+        }
     }
 }
 
