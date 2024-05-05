@@ -81,27 +81,27 @@ let dimensions = {
 const BIND_INFORMATION = [
     {
         key: "1",
-        description: "Change to frontal camera and toggle wireframe",
+        description: "Frontal camera, toggle wireframe",
     },
     {
         key: "2",
-        description: "Change to lateral camera",
+        description: "Lateral camera",
     },
     {
         key: "3",
-        description: "Change to top camera",
+        description: "Top camera",
     },
     {
         key: "4",
-        description: "Change to broad ortographic camera",
+        description: "Broad ortographic camera",
     },
     {
         key: "5",
-        description: "Change to broad prespective camera",
+        description: "Broad prespective camera",
     },
     {
         key: "6",
-        description: "Change to claw camera",
+        description: "Claw camera",
     },
     {
         key: "q",
@@ -828,9 +828,33 @@ function updateHUD() {
     "use strict";
     for (const key in pressedKeys) {
         let domElement = document.getElementById(key);
-        if (!!domElement) {
-            domElement.className = pressedKeys[key] ? "active" : "";
+        if (!!domElement ) {
+            if (!isFinite(key)) {
+                domElement.className = pressedKeys[key] ? "active" : "";
+            } else {
+                domElement.className = "";
+            }
         }
+    }
+    switch (currCamera) {
+    case frontalCamera:
+        document.getElementById('1').className = "active";
+        break;
+    case lateralCamera:
+        document.getElementById('2').className = "active";
+        break;
+    case topCamera:
+        document.getElementById('3').className = "active";
+        break;
+    case broadOCamera:
+        document.getElementById('4').className = "active";
+        break;
+    case broadPCamera:
+        document.getElementById('5').className = "active";
+        break;
+    case clawCamera:
+        document.getElementById('6').className = "active";
+        break;
     }
 }
 
