@@ -21,6 +21,8 @@ let scene, renderer, geometry, mesh;
 
 let crane, lowerCrane, upperCrane, trolley, claw;
 
+let clawBoundingBox, crateBoundingBoxes = [];
+
 let crate1, crate2, crate3, container;
 
 let materials = {
@@ -163,6 +165,8 @@ const MIN_CLAW_Y =
     -dimensions.hDifference - dimensions.hTower - dimensions.hClawBase;
 
 let ropeScale, trolleyX, towerAngle, clawY;
+
+let isAnimating = false;
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -559,6 +563,9 @@ function createClaw(x, y, z) {
     addClawFinger(claw, 0, 0, 0, Math.PI/2);
     addClawFinger(claw, 0, 0, 0, -Math.PI/2);
 
+    clawBoundingBox = new THREE.Box3();
+    clawBoundingBox.setFromObject(claw, true);
+
     claw.position.set(x, y, z);
 }
 
@@ -612,7 +619,7 @@ function addClawFinger(obj, x, y, z, rot) {
         5, 10, 11,
     ];
 
-    vertices = vertices.map(function(x) {return x * scaler});
+    vertices = vertices.map(x => x * scaler);
 
     geometry.setIndex(indices);
     geometry.setAttribute(
@@ -660,7 +667,12 @@ function addCrate(obj, pos, dim, rot, color) {
     mesh = new THREE.Mesh(geometry, color);
     mesh.rotation.y = rot;
     mesh.position.set(pos.x, pos.y + dim.y / 2, pos.z);
+    mesh.geometry.computeBoundingBox();
     obj.add(mesh);
+
+    const crateBoundingBox = new THREE.Box3();
+    crateBoundingBox.setFromObject(mesh, true);
+    crateBoundingBoxes.push(crateBoundingBox);
 }
 
 function createContainer() {
@@ -716,6 +728,13 @@ function addWall(obj, pos, dim, rot, color) {
 //////////////////////
 function checkCollisions() {
     "use strict";
+        clawBoundingBox.setFromObject(claw, true);
+
+        for (const crate of crateBoundingBoxes) {
+            if (clawBoundingBox.intersectsBox(crate)) {
+                isAnimating = true;
+            }
+    }
 }
 
 ///////////////////////
@@ -757,6 +776,8 @@ function update() {
     clawY = Math.min(clawY, MAX_CLAW_Y);
     clawY = Math.max(clawY, MIN_CLAW_Y);
     claw.position.y = clawY;
+
+    checkCollisions();
 }
 
 function keyUpdate() {
