@@ -177,7 +177,7 @@ const MIN_CLAW_Y =
 const X_AXIS = new THREE.Vector3(1, 0, 0);
 const Z_AXIS = new THREE.Vector3(0, 0, 1);
 const MIN_FINGER_ANGLE = 0;
-const MAX_FINGER_ANGLE = Math.PI / 2;
+const MAX_FINGER_ANGLE = Math.PI / 3;
 
 let ropeScale, trolleyX, towerAngle, clawY, fingerAngle;
 
