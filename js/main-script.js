@@ -53,6 +53,11 @@ let materials = {
         wireframe: false,
         side: THREE.DoubleSide,
     }),
+    purple: new THREE.MeshBasicMaterial({
+        color: 0xb600ff,
+        wireframe: false,
+        side: THREE.DoubleSide,
+    }),
 };
 
 const BASE_H_ROPE = 5;
@@ -79,6 +84,9 @@ let dimensions = {
     hClaw: 0,
     rRope: 0.5,
     hRope: BASE_H_ROPE,
+    rPendant: 0.1,
+    lFrontPendant: 20,
+    lRearPendant: 0,
 };
 
 const BIND_INFORMATION = [
@@ -105,6 +113,10 @@ const BIND_INFORMATION = [
     {
         key: "6",
         description: "Claw camera",
+    },
+    {
+        key: "7",
+        description: "Toggle Wireframe",
     },
     {
         key: "q",
@@ -147,6 +159,7 @@ let pressedKeys = {
     4: false,
     5: false,
     6: false,
+    7: false,
     q: false,
     a: false,
     w: false,
@@ -436,29 +449,58 @@ function createUpperCrane(x, y, z) {
         (dimensions.lTower + dimensions.lCab) / 2
     );
 
-    addRearPendant(upperCrane, 0, 30, 0);
+    let pointA = new THREE.Vector3(0, dimensions.hInferiorTowerPeak, 0);
+    let pointB = new THREE.Vector3(dimensions.cJib / 2, dimensions.hDifference, 0);
+    let pointC = new THREE.Vector3(-dimensions.cJib / 2, dimensions.hDifference, 0);
+    let direction = new THREE.Vector3().subVectors(pointA, pointB);
 
-    //addFrontPendant(upperCrane, 0, 0, 0);
+    addFrontPendant(
+        upperCrane,
+        dimensions.cJib / 4,
+        dimensions.hInferiorTowerPeak,
+        0,
+        direction
+    );
+
+    direction = new THREE.Vector3().subVectors(pointA, pointC);
+
+    addRearPendant(upperCrane, -dimensions.cCounterJib / 2, dimensions.hInferiorTowerPeak, 0, direction);
 
     upperCrane.position.set(x, y, z);
 }
 
-function addRearPendant(obj, x, y, z) {
+function addFrontPendant(obj, x, y, z, direction) {
     "use strict";
-    geometry = new THREE.CylinderGeometry(1, 1, 4);
-    mesh = new THREE.Mesh(geometry, materials);
+
+    geometry = new THREE.CylinderGeometry(
+        dimensions.rPendant,
+        dimensions.rPendant,
+        direction.length()
+    );
+    mesh = new THREE.Mesh(geometry, materials.purple);
+    mesh.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        direction.clone().normalize()
+    );
+
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
 
-function addFrontPendant(obj, x, y, z) {
+function addRearPendant(obj, x, y, z, direction) {
     "use strict";
-    geometry = new THREE.ConeGeometry(
-        (dimensions.lTower * Math.sqrt(2)) / 2,
-        dimensions.hSuperiorTowerPeak,
-        20
-    ).rotateY(3.925);
-    mesh = new THREE.Mesh(geometry, materials.darkOrange);
+
+    geometry = new THREE.CylinderGeometry(
+        dimensions.rPendant,
+        dimensions.rPendant,
+        direction.length()
+    );
+    mesh = new THREE.Mesh(geometry, materials.purple);
+    mesh.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        direction.clone().normalize()
+    );
+
     mesh.position.set(x, y, z);
     obj.add(mesh);
 }
@@ -935,10 +977,6 @@ function keyUpdate() {
             switch (key) {
                 case "1":
                     currCamera = frontalCamera;
-                    for (let material in materials) {
-                        materials[material].wireframe =
-                            !materials[material].wireframe;
-                    }
                     pressedKeys[key] = false;
                     break;
                 case "2":
@@ -959,6 +997,13 @@ function keyUpdate() {
                     break;
                 case "6":
                     currCamera = clawCamera;
+                    pressedKeys[key] = false;
+                    break;
+                case "7":
+                    for (let material in materials) {
+                        materials[material].wireframe =
+                            !materials[material].wireframe;
+                    }
                     pressedKeys[key] = false;
                     break;
             }
@@ -1015,6 +1060,8 @@ function updateHUD() {
             }
         }
     }
+    if (materials.coffeeBrown.wireframe == true) document.getElementById("7").className = "active";
+
     switch (currCamera) {
         case frontalCamera:
             document.getElementById("1").className = "active";
