@@ -83,7 +83,7 @@ let dimensions = {
 const BIND_INFORMATION = [
     {
         key: "1",
-        description: "Frontal camera, toggle wireframe",
+        description: "Frontal camera",
     },
     {
         key: "2",
@@ -104,6 +104,10 @@ const BIND_INFORMATION = [
     {
         key: "6",
         description: "Claw camera",
+    },
+    {
+        key: "7",
+        description: "Toggle wireframe",
     },
     {
         key: "q",
@@ -146,6 +150,7 @@ let pressedKeys = {
     4: false,
     5: false,
     6: false,
+    7: false,
     q: false,
     a: false,
     w: false,
@@ -880,10 +885,6 @@ function keyUpdate() {
             switch (key) {
                 case "1":
                     currCamera = frontalCamera;
-                    for (let material in materials) {
-                        materials[material].wireframe =
-                            !materials[material].wireframe;
-                    }
                     pressedKeys[key] = false;
                     break;
                 case "2":
@@ -904,6 +905,13 @@ function keyUpdate() {
                     break;
                 case "6":
                     currCamera = clawCamera;
+                    pressedKeys[key] = false;
+                    break;
+                case "7":
+                    for (let material in materials) {
+                        materials[material].wireframe =
+                            !materials[material].wireframe;
+                    }
                     pressedKeys[key] = false;
                     break;
             }
