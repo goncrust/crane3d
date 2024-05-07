@@ -21,7 +21,8 @@ let scene, renderer, geometry, mesh;
 
 let crane, lowerCrane, upperCrane, trolley, claw;
 
-let clawBoundingBox, crateBounds = [];
+let clawBoundingBox,
+    crateBounds = [];
 
 let crate1, crate2, crate3, container;
 
@@ -52,6 +53,11 @@ let materials = {
         wireframe: false,
         side: THREE.DoubleSide,
     }),
+    purple: new THREE.MeshBasicMaterial({
+        color: 0xb600ff,
+        wireframe: false,
+        side: THREE.DoubleSide,
+    }),
 };
 
 const BASE_H_ROPE = 5;
@@ -78,6 +84,9 @@ let dimensions = {
     hClaw: 0,
     rRope: 0.5,
     hRope: BASE_H_ROPE,
+    rPendant: 0.1,
+    lFrontPendant: 20,
+    lRearPendant: 0,
 };
 
 const BIND_INFORMATION = [
@@ -187,7 +196,8 @@ const MAX_FINGER_ANGLE = Math.PI / 4;
 let ropeScale, trolleyX, towerAngle, clawY, fingerAngle;
 
 const clock = new THREE.Clock();
-let trolleyMixer, clawFingerMixers = [];
+let trolleyMixer,
+    clawFingerMixers = [];
 let isAnimating = false;
 
 /////////////////////
@@ -229,7 +239,7 @@ function createLateralCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000,
+        1000
     );
     lateralCamera.position.set(0, 30, 70);
     lateralCamera.lookAt(0, 30, 0);
@@ -245,7 +255,7 @@ function createFrontalCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000,
+        1000
     );
     frontalCamera.position.set(100, 30, 0);
     frontalCamera.lookAt(0, 30, 0);
@@ -261,7 +271,7 @@ function createTopCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000,
+        1000
     );
     topCamera.position.set(0, 70, 0);
     topCamera.lookAt(0, 0, 0);
@@ -273,7 +283,7 @@ function createClawCamera() {
         70,
         window.innerWidth / window.innerHeight,
         1,
-        1000,
+        1000
     );
     claw.add(clawCamera);
 }
@@ -284,7 +294,7 @@ function createBroadPerpectiveCamera() {
         70,
         window.innerWidth / window.innerHeight,
         1,
-        1000,
+        1000
     );
     broadPCamera.position.set(40, 40, 40);
     broadPCamera.lookAt(0, 25, 0);
@@ -300,7 +310,7 @@ function createBroadOrthographicCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000,
+        1000
     );
     broadOCamera.position.set(40, 40, 40);
     broadOCamera.lookAt(0, 25, 0);
@@ -312,7 +322,7 @@ function createBroadOrthographicCamera() {
 
 function createHud() {
     "use strict";
-    let hud = document.createElement('div');
+    let hud = document.createElement("div");
     hud.className = "hud";
     addBindInfo(hud);
     document.body.appendChild(hud);
@@ -320,16 +330,16 @@ function createHud() {
 
 function addBindInfo(domObj) {
     "use strict";
-    let binds = document.createElement('div');
+    let binds = document.createElement("div");
     binds.className = "binds";
-    BIND_INFORMATION.map(info => addBindIndication(binds, info));
+    BIND_INFORMATION.map((info) => addBindIndication(binds, info));
     domObj.appendChild(binds);
 }
 
 function addBindIndication(domObj, bindInformation) {
     "use strict";
-    const {key , description} = bindInformation;
-    let bindIndication = document.createElement('div');
+    const { key, description } = bindInformation;
+    let bindIndication = document.createElement("div");
     bindIndication.id = key;
     bindIndication.innerText = `${key} - ${description}`;
     domObj.appendChild(bindIndication);
@@ -382,7 +392,7 @@ function addBase(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lBase,
         dimensions.hBase,
-        dimensions.lBase,
+        dimensions.lBase
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -394,7 +404,7 @@ function addTower(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lTower,
         dimensions.hTower,
-        dimensions.lTower,
+        dimensions.lTower
     );
     mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
@@ -415,7 +425,7 @@ function createUpperCrane(x, y, z) {
         upperCrane,
         0,
         dimensions.hInferiorTowerPeak + dimensions.hSuperiorTowerPeak / 2,
-        0,
+        0
     );
     addInferiorTowerPeak(upperCrane, 0, dimensions.hInferiorTowerPeak / 2, 0);
     addJib(upperCrane, (dimensions.lTower + dimensions.cJib) / 2, hJib, 0);
@@ -423,25 +433,76 @@ function createUpperCrane(x, y, z) {
         upperCrane,
         (-dimensions.lTower - dimensions.cCounterJib) / 2,
         hJib,
-        0,
+        0
     );
     addCounterWeight(
         upperCrane,
         (dimensions.cCounterWeight - dimensions.lTower) / 2 -
             dimensions.cCounterJib,
         hJib - dimensions.hJib,
-        0,
+        0
     );
     addCab(
         upperCrane,
         0,
         dimensions.hDifference / 2,
-        (dimensions.lTower + dimensions.lCab) / 2,
+        (dimensions.lTower + dimensions.lCab) / 2
     );
 
-    //addTurntable(upperCrane, x, y, z);
+    let pointA = new THREE.Vector3(0, dimensions.hInferiorTowerPeak, 0);
+    let pointB = new THREE.Vector3(dimensions.cJib / 2, dimensions.hDifference, 0);
+    let pointC = new THREE.Vector3(-dimensions.cJib / 2, dimensions.hDifference, 0);
+    let direction = new THREE.Vector3().subVectors(pointA, pointB);
+
+    addFrontPendant(
+        upperCrane,
+        dimensions.cJib / 4,
+        dimensions.hInferiorTowerPeak,
+        0,
+        direction
+    );
+
+    direction = new THREE.Vector3().subVectors(pointA, pointC);
+
+    addRearPendant(upperCrane, -dimensions.cCounterJib / 2, dimensions.hInferiorTowerPeak, 0, direction);
 
     upperCrane.position.set(x, y, z);
+}
+
+function addFrontPendant(obj, x, y, z, direction) {
+    "use strict";
+
+    geometry = new THREE.CylinderGeometry(
+        dimensions.rPendant,
+        dimensions.rPendant,
+        direction.length()
+    );
+    mesh = new THREE.Mesh(geometry, materials.purple);
+    mesh.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        direction.clone().normalize()
+    );
+
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
+}
+
+function addRearPendant(obj, x, y, z, direction) {
+    "use strict";
+
+    geometry = new THREE.CylinderGeometry(
+        dimensions.rPendant,
+        dimensions.rPendant,
+        direction.length()
+    );
+    mesh = new THREE.Mesh(geometry, materials.purple);
+    mesh.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        direction.clone().normalize()
+    );
+
+    mesh.position.set(x, y, z);
+    obj.add(mesh);
 }
 
 function addSuperiorTowerPeak(obj, x, y, z) {
@@ -449,7 +510,7 @@ function addSuperiorTowerPeak(obj, x, y, z) {
     geometry = new THREE.ConeGeometry(
         (dimensions.lTower * Math.sqrt(2)) / 2,
         dimensions.hSuperiorTowerPeak,
-        4,
+        4
     ).rotateY(3.925);
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -461,7 +522,7 @@ function addInferiorTowerPeak(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lTower,
         dimensions.hInferiorTowerPeak,
-        dimensions.lTower,
+        dimensions.lTower
     );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -473,7 +534,7 @@ function addJib(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cJib,
         dimensions.hJib,
-        dimensions.lTower,
+        dimensions.lTower
     );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -485,7 +546,7 @@ function addCounterJib(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cCounterJib,
         dimensions.hJib,
-        dimensions.lTower,
+        dimensions.lTower
     );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -497,7 +558,7 @@ function addCounterWeight(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cCounterWeight,
         dimensions.hCounterWeight,
-        dimensions.lTower,
+        dimensions.lTower
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -509,7 +570,7 @@ function addCab(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lTower,
         dimensions.lTower,
-        dimensions.lCab,
+        dimensions.lCab
     );
     mesh = new THREE.Mesh(geometry, materials.lightBlue);
     mesh.position.set(x, y, z);
@@ -530,7 +591,7 @@ function createTrolley(x, y, z) {
         trolley,
         0,
         -(dimensions.hTrolley + dimensions.hRope + dimensions.hClawBase / 2),
-        0,
+        0
     );
 
     trolley.position.set(x, y, z);
@@ -542,7 +603,7 @@ function addTrolley(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cTrolley,
         dimensions.hTrolley,
-        dimensions.lTower,
+        dimensions.lTower
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -554,7 +615,7 @@ function addRope(obj, x, y, z) {
     geometry = new THREE.CylinderGeometry(
         dimensions.rRope,
         dimensions.rRope,
-        dimensions.hRope,
+        dimensions.hRope
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -567,7 +628,7 @@ function addClawBase(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lClawBase,
         dimensions.hClawBase,
-        dimensions.lClawBase,
+        dimensions.lClawBase
     );
     mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
@@ -582,10 +643,10 @@ function createClaw(x, y, z) {
     // Referencial Bisneto: Pinças da garra
     claw.add(new THREE.AxesHelper(10));
     // Posições relativas ao novo referencial
-    addClawFinger(claw, 0, 0, 0, 0);
+    addClawFinger(claw, 0, 0, 0, 0);
     addClawFinger(claw, 0, 0, 0, Math.PI);
-    addClawFinger(claw, 0, 0, 0, Math.PI/2);
-    addClawFinger(claw, 0, 0, 0, -Math.PI/2);
+    addClawFinger(claw, 0, 0, 0, Math.PI / 2);
+    addClawFinger(claw, 0, 0, 0, -Math.PI / 2);
 
     clawBoundingBox = new THREE.Box3();
     clawBoundingBox.setFromObject(claw, true);
@@ -599,51 +660,66 @@ function addClawFinger(obj, x, y, z, rot) {
 
     geometry = new THREE.BufferGeometry();
     let vertices = new Float32Array([
-        0, 0, 0,        // 0
-        0, -2, 0,       // 1
-        5, -5, 0,       // 2
-        3.5, -5, 0,     // 3
-        3, -10, 0,      // 4
-        1, -12, 0,      // 5
-        0, 0, 2,        // 6 - 0
-        0, -2, 2,       // 7 - 1
-        5, -5, 2,       // 8 - 2
-        3.5, -5, 2,     // 9 - 3
-        3, -10, 2,      // 10 - 4
-        3, -10, 2,      // 11 - 5
+        0,
+        0,
+        0, // 0
+        0,
+        -2,
+        0, // 1
+        5,
+        -5,
+        0, // 2
+        3.5,
+        -5,
+        0, // 3
+        3,
+        -10,
+        0, // 4
+        1,
+        -12,
+        0, // 5
+        0,
+        0,
+        2, // 6 - 0
+        0,
+        -2,
+        2, // 7 - 1
+        5,
+        -5,
+        2, // 8 - 2
+        3.5,
+        -5,
+        2, // 9 - 3
+        3,
+        -10,
+        2, // 10 - 4
+        3,
+        -10,
+        2, // 11 - 5
     ]);
 
     const indices = [
         // 0-1-6-7 Square
-        0, 1, 6,
-        1, 6, 7,
+        0, 1, 6, 1, 6, 7,
         // 0-1-2-3 Rectangle
-        0, 1, 2,
-        1, 2, 3,
+        0, 1, 2, 1, 2, 3,
         // 0-2-6-8 Rectangle
-        0, 2, 6,
-        2, 6, 8,
+        0, 2, 6, 2, 6, 8,
         // 1-3-7-9 Rectangle
-        1, 3, 7,
-        3, 7, 9,
+        1, 3, 7, 3, 7, 9,
         // 2-3-8-9 Square
-        2, 3, 8,
-        3, 8, 9,
+        2, 3, 8, 3, 8, 9,
         // 2-3-4-5 Rectangle
-        2, 3, 4,
-        3, 4, 5,
+        2, 3, 4, 3, 4, 5,
         // 8-9-10-11 Rectangle
-        8, 9, 10,
-        9, 10, 11,
+        8, 9, 10, 9, 10, 11,
         // 3-5-9-11 Rectangle
-        3, 5, 9,
-        5, 9, 11,
+        3, 5, 9, 5, 9, 11,
         // 4-5-10-11 Square
-        4, 5, 10,
-        5, 10, 11,
+        4, 5, 10, 5, 10, 11,
     ];
 
-    vertices = vertices.map(x => x * scaler);
+    vertices = vertices.map((x) => x * scaler);
 
     geometry.setIndex(indices);
     geometry.setAttribute(
@@ -701,7 +777,7 @@ function addCrate(obj, pos, dim, rot, color) {
     const crateBoundingBox = new THREE.Box3();
     crateBoundingBox.setFromObject(mesh, true);
     crateBoundingBox.getBoundingSphere(crateBoundingSphere);
-    crateBounds.push({box: crateBoundingBox, sphere: crateBoundingSphere});
+    crateBounds.push({ box: crateBoundingBox, sphere: crateBoundingSphere });
 }
 
 function createContainer() {
@@ -778,15 +854,19 @@ function checkCollisions() {
 function handleCollisions() {
     "use strict";
     const quaternions = [
-        (new THREE.Quaternion()).setFromAxisAngle(Z_AXIS, MAX_FINGER_ANGLE),
-        (new THREE.Quaternion()).setFromAxisAngle(Z_AXIS, -MAX_FINGER_ANGLE),
-        (new THREE.Quaternion()).setFromAxisAngle(X_AXIS, MAX_FINGER_ANGLE),
-        (new THREE.Quaternion()).setFromAxisAngle(X_AXIS, -MAX_FINGER_ANGLE),
+        new THREE.Quaternion().setFromAxisAngle(Z_AXIS, MAX_FINGER_ANGLE),
+        new THREE.Quaternion().setFromAxisAngle(Z_AXIS, -MAX_FINGER_ANGLE),
+        new THREE.Quaternion().setFromAxisAngle(X_AXIS, MAX_FINGER_ANGLE),
+        new THREE.Quaternion().setFromAxisAngle(X_AXIS, -MAX_FINGER_ANGLE),
     ];
 
     for (let i = 0; i < clawFingerMixers.length; i++) {
         console.log("entrou");
-        animateClawFinger(claw.children[i+1], clawFingerMixers[i], quaternions[i]);
+        animateClawFinger(
+            claw.children[i + 1],
+            clawFingerMixers[i],
+            quaternions[i]
+        );
     }
 
     animateTrolley();
@@ -802,8 +882,14 @@ function animateClawFinger(finger, mixer, max_quaternion) {
 
     // TODO: Put center of claw directly above center of collided object
 
-    const openClawFingerKF = new THREE.QuaternionKeyframeTrack(".quaternion", times, values);
-    const openClawFingerClip = new THREE.AnimationClip("open-claw", -1, [openClawFingerKF]);
+    const openClawFingerKF = new THREE.QuaternionKeyframeTrack(
+        ".quaternion",
+        times,
+        values
+    );
+    const openClawFingerClip = new THREE.AnimationClip("open-claw", -1, [
+        openClawFingerKF,
+    ]);
     const openClawFingerAction = mixer.clipAction(openClawFingerClip);
     openClawFingerAction.setLoop(THREE.LoopOnce);
     openClawFingerAction.play();
@@ -821,8 +907,14 @@ function animateTrolley() {
         trolley.position.z,
     ];
 
-    const moveTrolleyKF = new THREE.VectorKeyframeTrack(".position", times, values);
-    const moveTrolleyClip = new THREE.AnimationClip("forward", -1, [moveTrolleyKF]);
+    const moveTrolleyKF = new THREE.VectorKeyframeTrack(
+        ".position",
+        times,
+        values
+    );
+    const moveTrolleyClip = new THREE.AnimationClip("forward", -1, [
+        moveTrolleyKF,
+    ]);
     const moveTrolleyAction = trolleyMixer.clipAction(moveTrolleyClip);
     moveTrolleyAction.setLoop(THREE.LoopOnce);
     moveTrolleyAction.play();
@@ -960,7 +1052,7 @@ function updateHUD() {
     "use strict";
     for (const key in pressedKeys) {
         let domElement = document.getElementById(key);
-        if (!!domElement ) {
+        if (!!domElement) {
             if (!isFinite(key)) {
                 domElement.className = pressedKeys[key] ? "active" : "";
             } else {
@@ -968,25 +1060,27 @@ function updateHUD() {
             }
         }
     }
+    if (materials.coffeeBrown.wireframe == true) document.getElementById("7").className = "active";
+
     switch (currCamera) {
-    case frontalCamera:
-        document.getElementById('1').className = "active";
-        break;
-    case lateralCamera:
-        document.getElementById('2').className = "active";
-        break;
-    case topCamera:
-        document.getElementById('3').className = "active";
-        break;
-    case broadOCamera:
-        document.getElementById('4').className = "active";
-        break;
-    case broadPCamera:
-        document.getElementById('5').className = "active";
-        break;
-    case clawCamera:
-        document.getElementById('6').className = "active";
-        break;
+        case frontalCamera:
+            document.getElementById("1").className = "active";
+            break;
+        case lateralCamera:
+            document.getElementById("2").className = "active";
+            break;
+        case topCamera:
+            document.getElementById("3").className = "active";
+            break;
+        case broadOCamera:
+            document.getElementById("4").className = "active";
+            break;
+        case broadPCamera:
+            document.getElementById("5").className = "active";
+            break;
+        case clawCamera:
+            document.getElementById("6").className = "active";
+            break;
     }
 }
 
