@@ -73,7 +73,7 @@ let dimensions = {
     hTrolley: 3,
     cTrolley: 6,
     lClawBase: 3,
-    hClawBase: 2,
+    hClawBase: 1,
     lClaw: 2,
     hClaw: 0,
     rRope: 0.5,
@@ -177,7 +177,7 @@ const MIN_CLAW_Y =
 const X_AXIS = new THREE.Vector3(1, 0, 0);
 const Z_AXIS = new THREE.Vector3(0, 0, 1);
 const MIN_FINGER_ANGLE = 0;
-const MAX_FINGER_ANGLE = Math.PI / 3;
+const MAX_FINGER_ANGLE = Math.PI / 4;
 
 let ropeScale, trolleyX, towerAngle, clawY, fingerAngle;
 
@@ -794,6 +794,8 @@ function animateClawFinger(finger, mixer, max_quaternion) {
         ...finger.quaternion.toArray(),
         ...max_quaternion.toArray(),
     ];
+
+    // TODO: Put center of claw directly above center of collided object
 
     const openClawFingerKF = new THREE.QuaternionKeyframeTrack(".quaternion", times, values);
     const openClawFingerClip = new THREE.AnimationClip("open-claw", -1, [openClawFingerKF]);
