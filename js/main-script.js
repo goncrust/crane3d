@@ -239,7 +239,7 @@ function createLateralCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000
+        1000,
     );
     lateralCamera.position.set(0, 30, 70);
     lateralCamera.lookAt(0, 30, 0);
@@ -255,7 +255,7 @@ function createFrontalCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000
+        1000,
     );
     frontalCamera.position.set(100, 30, 0);
     frontalCamera.lookAt(0, 30, 0);
@@ -271,7 +271,7 @@ function createTopCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000
+        1000,
     );
     topCamera.position.set(0, 70, 0);
     topCamera.lookAt(0, 0, 0);
@@ -283,7 +283,7 @@ function createClawCamera() {
         70,
         window.innerWidth / window.innerHeight,
         1,
-        1000
+        1000,
     );
     claw.add(clawCamera);
 }
@@ -294,7 +294,7 @@ function createBroadPerpectiveCamera() {
         70,
         window.innerWidth / window.innerHeight,
         1,
-        1000
+        1000,
     );
     broadPCamera.position.set(40, 40, 40);
     broadPCamera.lookAt(0, 25, 0);
@@ -310,7 +310,7 @@ function createBroadOrthographicCamera() {
         viewSize / 2,
         viewSize / -2,
         1,
-        1000
+        1000,
     );
     broadOCamera.position.set(40, 40, 40);
     broadOCamera.lookAt(0, 25, 0);
@@ -392,7 +392,7 @@ function addBase(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lBase,
         dimensions.hBase,
-        dimensions.lBase
+        dimensions.lBase,
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -404,7 +404,7 @@ function addTower(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lTower,
         dimensions.hTower,
-        dimensions.lTower
+        dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
@@ -425,7 +425,7 @@ function createUpperCrane(x, y, z) {
         upperCrane,
         0,
         dimensions.hInferiorTowerPeak + dimensions.hSuperiorTowerPeak / 2,
-        0
+        0,
     );
     addInferiorTowerPeak(upperCrane, 0, dimensions.hInferiorTowerPeak / 2, 0);
     addJib(upperCrane, (dimensions.lTower + dimensions.cJib) / 2, hJib, 0);
@@ -433,25 +433,33 @@ function createUpperCrane(x, y, z) {
         upperCrane,
         (-dimensions.lTower - dimensions.cCounterJib) / 2,
         hJib,
-        0
+        0,
     );
     addCounterWeight(
         upperCrane,
         (dimensions.cCounterWeight - dimensions.lTower) / 2 -
             dimensions.cCounterJib,
         hJib - dimensions.hJib,
-        0
+        0,
     );
     addCab(
         upperCrane,
         0,
         dimensions.hDifference / 2,
-        (dimensions.lTower + dimensions.lCab) / 2
+        (dimensions.lTower + dimensions.lCab) / 2,
     );
 
     let pointA = new THREE.Vector3(0, dimensions.hInferiorTowerPeak, 0);
-    let pointB = new THREE.Vector3(dimensions.cJib / 2, dimensions.hDifference, 0);
-    let pointC = new THREE.Vector3(-dimensions.cJib / 2, dimensions.hDifference, 0);
+    let pointB = new THREE.Vector3(
+        dimensions.cJib / 2,
+        dimensions.hDifference,
+        0,
+    );
+    let pointC = new THREE.Vector3(
+        -dimensions.cJib / 2,
+        dimensions.hDifference,
+        0,
+    );
     let direction = new THREE.Vector3().subVectors(pointA, pointB);
 
     addFrontPendant(
@@ -459,12 +467,18 @@ function createUpperCrane(x, y, z) {
         dimensions.cJib / 4,
         dimensions.hInferiorTowerPeak,
         0,
-        direction
+        direction,
     );
 
     direction = new THREE.Vector3().subVectors(pointA, pointC);
 
-    addRearPendant(upperCrane, -dimensions.cCounterJib / 2, dimensions.hInferiorTowerPeak, 0, direction);
+    addRearPendant(
+        upperCrane,
+        -dimensions.cCounterJib / 2,
+        dimensions.hInferiorTowerPeak,
+        0,
+        direction,
+    );
 
     upperCrane.position.set(x, y, z);
 }
@@ -475,12 +489,12 @@ function addFrontPendant(obj, x, y, z, direction) {
     geometry = new THREE.CylinderGeometry(
         dimensions.rPendant,
         dimensions.rPendant,
-        direction.length()
+        direction.length(),
     );
     mesh = new THREE.Mesh(geometry, materials.purple);
     mesh.quaternion.setFromUnitVectors(
         new THREE.Vector3(0, 1, 0),
-        direction.clone().normalize()
+        direction.clone().normalize(),
     );
 
     mesh.position.set(x, y, z);
@@ -493,12 +507,12 @@ function addRearPendant(obj, x, y, z, direction) {
     geometry = new THREE.CylinderGeometry(
         dimensions.rPendant,
         dimensions.rPendant,
-        direction.length()
+        direction.length(),
     );
     mesh = new THREE.Mesh(geometry, materials.purple);
     mesh.quaternion.setFromUnitVectors(
         new THREE.Vector3(0, 1, 0),
-        direction.clone().normalize()
+        direction.clone().normalize(),
     );
 
     mesh.position.set(x, y, z);
@@ -510,7 +524,7 @@ function addSuperiorTowerPeak(obj, x, y, z) {
     geometry = new THREE.ConeGeometry(
         (dimensions.lTower * Math.sqrt(2)) / 2,
         dimensions.hSuperiorTowerPeak,
-        4
+        4,
     ).rotateY(3.925);
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -522,7 +536,7 @@ function addInferiorTowerPeak(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lTower,
         dimensions.hInferiorTowerPeak,
-        dimensions.lTower
+        dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -534,7 +548,7 @@ function addJib(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cJib,
         dimensions.hJib,
-        dimensions.lTower
+        dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -546,7 +560,7 @@ function addCounterJib(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cCounterJib,
         dimensions.hJib,
-        dimensions.lTower
+        dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.darkOrange);
     mesh.position.set(x, y, z);
@@ -558,7 +572,7 @@ function addCounterWeight(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cCounterWeight,
         dimensions.hCounterWeight,
-        dimensions.lTower
+        dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -570,7 +584,7 @@ function addCab(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lTower,
         dimensions.lTower,
-        dimensions.lCab
+        dimensions.lCab,
     );
     mesh = new THREE.Mesh(geometry, materials.lightBlue);
     mesh.position.set(x, y, z);
@@ -591,7 +605,7 @@ function createTrolley(x, y, z) {
         trolley,
         0,
         -(dimensions.hTrolley + dimensions.hRope + dimensions.hClawBase / 2),
-        0
+        0,
     );
 
     trolley.position.set(x, y, z);
@@ -603,7 +617,7 @@ function addTrolley(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.cTrolley,
         dimensions.hTrolley,
-        dimensions.lTower
+        dimensions.lTower,
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -615,7 +629,7 @@ function addRope(obj, x, y, z) {
     geometry = new THREE.CylinderGeometry(
         dimensions.rRope,
         dimensions.rRope,
-        dimensions.hRope
+        dimensions.hRope,
     );
     mesh = new THREE.Mesh(geometry, materials.grey);
     mesh.position.set(x, y, z);
@@ -628,7 +642,7 @@ function addClawBase(obj, x, y, z) {
     geometry = new THREE.BoxGeometry(
         dimensions.lClawBase,
         dimensions.hClawBase,
-        dimensions.lClawBase
+        dimensions.lClawBase,
     );
     mesh = new THREE.Mesh(geometry, materials.lightOrange);
     mesh.position.set(x, y, z);
@@ -643,7 +657,7 @@ function createClaw(x, y, z) {
     // Referencial Bisneto: Pinças da garra
     claw.add(new THREE.AxesHelper(10));
     // Posições relativas ao novo referencial
-    addClawFinger(claw, 0, 0, 0, 0);
+    addClawFinger(claw, 0, 0, 0, 0);
     addClawFinger(claw, 0, 0, 0, Math.PI);
     addClawFinger(claw, 0, 0, 0, Math.PI / 2);
     addClawFinger(claw, 0, 0, 0, -Math.PI / 2);
@@ -724,7 +738,7 @@ function addClawFinger(obj, x, y, z, rot) {
     geometry.setIndex(indices);
     geometry.setAttribute(
         "position",
-        new THREE.Float32BufferAttribute(vertices, 3)
+        new THREE.Float32BufferAttribute(vertices, 3),
     );
     geometry.rotateY(rot);
 
@@ -865,11 +879,9 @@ function handleCollisions() {
         animateClawFinger(
             claw.children[i + 1],
             clawFingerMixers[i],
-            quaternions[i]
+            quaternions[i],
         );
     }
-
-    animateTrolley();
 }
 
 function animateClawFinger(finger, mixer, max_quaternion) {
@@ -885,14 +897,19 @@ function animateClawFinger(finger, mixer, max_quaternion) {
     const openClawFingerKF = new THREE.QuaternionKeyframeTrack(
         ".quaternion",
         times,
-        values
+        values,
     );
     const openClawFingerClip = new THREE.AnimationClip("open-claw", -1, [
         openClawFingerKF,
     ]);
     const openClawFingerAction = mixer.clipAction(openClawFingerClip);
     openClawFingerAction.setLoop(THREE.LoopOnce);
+    openClawFingerAction.clampWhenFinished = true;
+    mixer.addEventListener("finished", function (e) {
+        animateTrolley();
+    });
     openClawFingerAction.play();
+    fingerAngle = MAX_FINGER_ANGLE;
 }
 
 function animateTrolley() {
@@ -910,14 +927,19 @@ function animateTrolley() {
     const moveTrolleyKF = new THREE.VectorKeyframeTrack(
         ".position",
         times,
-        values
+        values,
     );
     const moveTrolleyClip = new THREE.AnimationClip("forward", -1, [
         moveTrolleyKF,
     ]);
     const moveTrolleyAction = trolleyMixer.clipAction(moveTrolleyClip);
     moveTrolleyAction.setLoop(THREE.LoopOnce);
+    moveTrolleyAction.clampWhenFinished = true;
+    trolleyMixer.addEventListener("finished", function (e) {
+        isAnimating = false;
+    });
     moveTrolleyAction.play();
+    trolleyX = MAX_TROLLEY_X;
 }
 
 ////////////
@@ -1060,7 +1082,8 @@ function updateHUD() {
             }
         }
     }
-    if (materials.coffeeBrown.wireframe == true) document.getElementById("7").className = "active";
+    if (materials.coffeeBrown.wireframe == true)
+        document.getElementById("7").className = "active";
 
     switch (currCamera) {
         case frontalCamera:
