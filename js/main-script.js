@@ -197,7 +197,8 @@ let ropeScale, trolleyX, towerAngle, clawY, fingerAngle;
 
 const clock = new THREE.Clock();
 let trolleyMixer,
-    clawFingerMixers = [];
+    clawFingerMixers = [],
+    upperCraneMixer;
 let isAnimating = false;
 
 /////////////////////
@@ -481,6 +482,7 @@ function createUpperCrane(x, y, z) {
     );
 
     upperCrane.position.set(x, y, z);
+    upperCraneMixer = new THREE.AnimationMixer(upperCrane);
 }
 
 function addFrontPendant(obj, x, y, z, direction) {
@@ -875,7 +877,6 @@ function handleCollisions() {
     ];
 
     for (let i = 0; i < clawFingerMixers.length; i++) {
-        console.log("entrou");
         animateClawFinger(
             claw.children[i + 1],
             clawFingerMixers[i],
@@ -886,13 +887,11 @@ function handleCollisions() {
 
 function animateClawFinger(finger, mixer, max_quaternion) {
     "use strict";
-    const times = [0, 2];
+    const times = [0, 1];
     const values = [
         ...finger.quaternion.toArray(),
         ...max_quaternion.toArray(),
     ];
-
-    // TODO: Put center of claw directly above center of collided object
 
     const openClawFingerKF = new THREE.QuaternionKeyframeTrack(
         ".quaternion",
@@ -907,14 +906,46 @@ function animateClawFinger(finger, mixer, max_quaternion) {
     openClawFingerAction.clampWhenFinished = true;
     mixer.addEventListener("finished", function (e) {
         animateTrolley();
+        animateUpperCraneRotation();
     });
     openClawFingerAction.play();
     fingerAngle = MAX_FINGER_ANGLE;
 }
 
+function animateUpperCraneRotation() {
+    const times = [0, 2];
+    let max_quaternion = new THREE.Quaternion().setFromAxisAngle(
+        Y_AXIS,
+        MAX_TOWER_ANGLE,
+    );
+    const values = [
+        ...upperCrane.quaternion.toArray(),
+        ...max_quaternion.toArray(),
+    ];
+
+    const upperCraneRotationKF = new THREE.QuaternionKeyframeTrack(
+        ".quaternion",
+        times,
+        values,
+    );
+    const upperCraneRotationClip = new THREE.AnimationClip(
+        "crane-rotation",
+        -1,
+        [upperCraneRotationKF],
+    );
+    const upperCraneRotationAction = upperCraneMixer.clipAction(
+        upperCraneRotationClip,
+    );
+    upperCraneRotationAction.setLoop(THREE.LoopOnce);
+    upperCraneRotationAction.clampWhenFinished = true;
+    upperCraneMixer.addEventListener("finished", function (e) {});
+    upperCraneRotationAction.play();
+    towerAngle = MAX_TOWER_ANGLE;
+}
+
 function animateTrolley() {
     "use strict";
-    const times = [0, 2];
+    const times = [0, 1];
     const values = [
         trolley.position.x,
         trolley.position.y,
@@ -936,7 +967,7 @@ function animateTrolley() {
     moveTrolleyAction.setLoop(THREE.LoopOnce);
     moveTrolleyAction.clampWhenFinished = true;
     trolleyMixer.addEventListener("finished", function (e) {
-        isAnimating = false;
+        //isAnimating = false;
     });
     moveTrolleyAction.play();
     trolleyX = MAX_TROLLEY_X;
@@ -988,6 +1019,7 @@ function update() {
         mixer.update(delta);
     }
     trolleyMixer.update(delta);
+    upperCraneMixer.update(delta);
 
     checkCollisions();
 }
