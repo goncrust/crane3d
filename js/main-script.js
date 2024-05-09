@@ -24,7 +24,8 @@ let crane, lowerCrane, upperCrane, trolley, claw;
 let clawBoundingBox,
     crateBounds = [];
 
-let crate1, crate2, crate3, container;
+let crates = [],
+    container;
 
 let materials = {
     grey: new THREE.MeshBasicMaterial({ color: 0x727272, wireframe: false }),
@@ -754,30 +755,20 @@ function addClawFinger(obj, x, y, z, rot) {
 
 function createCrates() {
     "use strict";
-    crate1 = new THREE.Object3D();
-
+    crates.push(new THREE.Object3D());
     let pos = new THREE.Vector3(20, 0, -10);
     let dim = new THREE.Vector3(5, 5, 5);
     let rot = 1;
-    addCrate(crate1, pos, dim, rot, materials.coffeeBrown);
+    addCrate(crates[0], pos, dim, rot, materials.coffeeBrown);
 
-    crate2 = new THREE.Object3D();
-
+    crates.push(new THREE.Object3D());
     pos = new THREE.Vector3(10, 0, -20);
     dim = new THREE.Vector3(5, 5, 5);
     rot = 0;
-    addCrate(crate2, pos, dim, rot, materials.redBrown);
+    addCrate(crates[1], pos, dim, rot, materials.redBrown);
 
-    crate3 = new THREE.Object3D();
-
-    pos = new THREE.Vector3(-30, 0, -10);
-    dim = new THREE.Vector3(10, 20, 5);
-    rot = 1.7;
-    addCrate(crate3, pos, dim, rot, materials.redBrown);
-
-    scene.add(crate1);
-    scene.add(crate2);
-    //scene.add(crate3);
+    scene.add(crates[0]);
+    scene.add(crates[1]);
 }
 
 function addCrate(obj, pos, dim, rot, color) {
@@ -854,11 +845,11 @@ function checkCollisions() {
     clawBoundingBox.setFromObject(claw, true);
     clawBoundingBox.getBoundingSphere(clawBoundingSphere);
 
-    for (const bound of crateBounds) {
-        if (clawBoundingSphere.intersectsSphere(bound.sphere)) {
-            if (clawBoundingBox.intersectsBox(bound.box)) {
+    for (let i = 0; i < crateBounds.length; i++) {
+        if (clawBoundingSphere.intersectsSphere(crateBounds[i].sphere)) {
+            if (clawBoundingBox.intersectsBox(crateBounds[i].box)) {
                 isAnimating = true;
-                handleCollisions();
+                handleCollisions(crates[i]);
             }
         }
     }
@@ -867,7 +858,7 @@ function checkCollisions() {
 ///////////////////////
 /* HANDLE COLLISIONS */
 ///////////////////////
-function handleCollisions() {
+function handleCollisions(crateObj) {
     "use strict";
     const quaternions = [
         new THREE.Quaternion().setFromAxisAngle(Z_AXIS, MAX_FINGER_ANGLE),
@@ -876,16 +867,19 @@ function handleCollisions() {
         new THREE.Quaternion().setFromAxisAngle(X_AXIS, -MAX_FINGER_ANGLE),
     ];
 
+    let crate = crateObj.children[0];
+
     for (let i = 0; i < clawFingerMixers.length; i++) {
         animateClawFinger(
             claw.children[i],
             clawFingerMixers[i],
             quaternions[i],
+            crate,
         );
     }
 }
 
-function animateClawFinger(finger, mixer, max_quaternion) {
+function animateClawFinger(finger, mixer, max_quaternion, crate) {
     "use strict";
     const times = [0, 1];
     const values = [
@@ -905,14 +899,17 @@ function animateClawFinger(finger, mixer, max_quaternion) {
     openClawFingerAction.setLoop(THREE.LoopOnce);
     openClawFingerAction.clampWhenFinished = true;
     mixer.addEventListener("finished", function (e) {
-        animateTrolley();
-        animateUpperCraneRotation();
+        crate.position.x = 0;
+        crate.position.y = -4;
+        crate.position.z = 0;
+        claw.add(crate);
+        animateTrolley(crate);
     });
     openClawFingerAction.play();
     fingerAngle = MAX_FINGER_ANGLE;
 }
 
-function animateUpperCraneRotation() {
+function animateUpperCraneRotation(crate) {
     const times = [0, 2];
     let max_quaternion = new THREE.Quaternion().setFromAxisAngle(
         Y_AXIS,
@@ -938,12 +935,15 @@ function animateUpperCraneRotation() {
     );
     upperCraneRotationAction.setLoop(THREE.LoopOnce);
     upperCraneRotationAction.clampWhenFinished = true;
-    upperCraneMixer.addEventListener("finished", function (e) {});
+    upperCraneMixer.addEventListener("finished", function (e) {
+        claw.remove(crate);
+        isAnimating = false;
+    });
     upperCraneRotationAction.play();
     towerAngle = MAX_TOWER_ANGLE;
 }
 
-function animateTrolley() {
+function animateTrolley(crate) {
     "use strict";
     const times = [0, 1];
     const values = [
@@ -967,7 +967,7 @@ function animateTrolley() {
     moveTrolleyAction.setLoop(THREE.LoopOnce);
     moveTrolleyAction.clampWhenFinished = true;
     trolleyMixer.addEventListener("finished", function (e) {
-        //isAnimating = false;
+        animateUpperCraneRotation(crate);
     });
     moveTrolleyAction.play();
     trolleyX = MAX_TROLLEY_X;
