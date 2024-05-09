@@ -380,7 +380,7 @@ function createLowerCrane(x, y, z) {
 
     lowerCrane = new THREE.Object3D();
 
-    lowerCrane.add(new THREE.AxesHelper(10));
+    //lowerCrane.add(new THREE.AxesHelper(10));
 
     addBase(lowerCrane, 0, dimensions.hBase / 2, 0);
     addTower(lowerCrane, 0, dimensions.hTower / 2 + dimensions.hBase, 0);
@@ -419,7 +419,7 @@ function createUpperCrane(x, y, z) {
     upperCrane = new THREE.Object3D();
 
     // Referencial Filho: Eixo Rotatório
-    upperCrane.add(new THREE.AxesHelper(10));
+    //upperCrane.add(new THREE.AxesHelper(10));
 
     // Posições relativas ao novo referencial
     addSuperiorTowerPeak(
@@ -598,7 +598,7 @@ function createTrolley(x, y, z) {
 
     trolley = new THREE.Object3D();
     // Referencial Neto: Carrinho
-    trolley.add(new THREE.AxesHelper(10));
+    //trolley.add(new THREE.AxesHelper(10));
 
     // Posições relativas ao novo referencial
     addTrolley(trolley, 0, -dimensions.hTrolley / 2, 0);
@@ -657,7 +657,7 @@ function createClaw(x, y, z) {
 
     claw = new THREE.Object3D();
     // Referencial Bisneto: Pinças da garra
-    claw.add(new THREE.AxesHelper(10));
+    //claw.add(new THREE.AxesHelper(10));
     // Posições relativas ao novo referencial
     addClawFinger(claw, 0, 0, 0, 0);
     addClawFinger(claw, 0, 0, 0, Math.PI);
@@ -777,7 +777,7 @@ function createCrates() {
 
     scene.add(crate1);
     scene.add(crate2);
-    scene.add(crate3);
+    //scene.add(crate3);
 }
 
 function addCrate(obj, pos, dim, rot, color) {
@@ -878,7 +878,7 @@ function handleCollisions() {
 
     for (let i = 0; i < clawFingerMixers.length; i++) {
         animateClawFinger(
-            claw.children[i + 1],
+            claw.children[i],
             clawFingerMixers[i],
             quaternions[i],
         );
@@ -1009,10 +1009,10 @@ function update() {
     fingerAngle = Math.min(fingerAngle, MAX_FINGER_ANGLE);
     fingerAngle = Math.max(fingerAngle, MIN_FINGER_ANGLE);
     // TODO: Atualizar estes índices quando removermos o axes helper
-    claw.children[1].setRotationFromAxisAngle(Z_AXIS, fingerAngle);
-    claw.children[2].setRotationFromAxisAngle(Z_AXIS, -fingerAngle);
-    claw.children[3].setRotationFromAxisAngle(X_AXIS, fingerAngle);
-    claw.children[4].setRotationFromAxisAngle(X_AXIS, -fingerAngle);
+    claw.children[0].setRotationFromAxisAngle(Z_AXIS, fingerAngle);
+    claw.children[1].setRotationFromAxisAngle(Z_AXIS, -fingerAngle);
+    claw.children[2].setRotationFromAxisAngle(X_AXIS, fingerAngle);
+    claw.children[3].setRotationFromAxisAngle(X_AXIS, -fingerAngle);
 
     const delta = clock.getDelta();
     for (const mixer of clawFingerMixers) {
