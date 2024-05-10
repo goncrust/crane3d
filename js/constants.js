@@ -34,7 +34,7 @@ const MATERIALS = {
         color: 0x85e6fc,
         wireframe: false,
     }),
-    redBrown: new THREE.MeshBasicMaterial({
+    red: new THREE.MeshBasicMaterial({
         color: 0xa52a2a,
         wireframe: false,
     }),
