@@ -60,6 +60,7 @@ let phases = Array(ANIMATION_PHASES).fill(false);
 phases[0] = true;
 
 const clock = new THREE.Clock();
+let delta;
 
 /////////////////////
 /* CREATE SCENE(S) */
@@ -83,6 +84,7 @@ function update() {
     keyUpdate();
     updateClawCamera();
     updateHUD();
+    delta = clock.getDelta();
 
     if (isAnimating) {
         animationUpdate();
@@ -92,8 +94,6 @@ function update() {
 }
 
 function animationUpdate() {
-    const delta = clock.getDelta();
-
     if (phases[0] && fingerAngle != MAX_FINGER_ANGLE) {
 
         modifyFingerAngle(fingerAngle + 2 * delta);
