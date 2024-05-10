@@ -18,6 +18,7 @@ export {
     Z_AXIS,
     MIN_FINGER_ANGLE,
     MAX_FINGER_ANGLE,
+    ANIMATION_PHASES,
 };
 
 const MATERIALS = {
@@ -169,3 +170,5 @@ const MAX_FINGER_ANGLE = Math.PI / 4;
 const X_AXIS = new THREE.Vector3(1, 0, 0);
 const Y_AXIS = new THREE.Vector3(0, 1, 0);
 const Z_AXIS = new THREE.Vector3(0, 0, 1);
+
+const ANIMATION_PHASES = 5;

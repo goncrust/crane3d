@@ -36,6 +36,7 @@ import {
     X_AXIS,
     Y_AXIS,
     Z_AXIS,
+    ANIMATION_PHASES,
 } from "./constants.js";
 import {
     lateralCamera,
@@ -55,7 +56,7 @@ let crateMesh;
 let scene, renderer;
 let currCamera;
 
-let phases = Array(4).fill(false);
+let phases = Array(ANIMATION_PHASES).fill(false);
 phases[0] = true;
 
 const clock = new THREE.Clock();
@@ -79,6 +80,10 @@ function createScene() {
 /* UPDATE */
 ////////////
 function update() {
+    keyUpdate();
+    updateClawCamera();
+    updateHUD();
+
     if (isAnimating) {
         animationUpdate();
     } else {
@@ -116,7 +121,7 @@ function animationUpdate() {
             claw.add(crateMesh);
         }
 
-        modifyRopeScale(ropeScale - 2 * delta);
+        modifyRopeScale(ropeScale - 4 * delta);
         modifyRopeScale(Math.max(ropeScale, MIN_ROPE_SCALE));
         let hRope = BASE_H_ROPE * ropeScale;
         let rope = trolley.getObjectByName("rope");
@@ -128,7 +133,7 @@ function animationUpdate() {
             DIMENSIONS.hClawBase / 2
         );
 
-        modifyClawY(clawY + 10 * delta);
+        modifyClawY(clawY + 20 * delta);
         modifyClawY(Math.min(clawY, MAX_CLAW_Y));
         claw.position.y = clawY;
 
@@ -144,9 +149,18 @@ function animationUpdate() {
     } else if (phases[2]) {
         phases[2] = false;
         phases[3] = true;
-    } else if (phases[3] && ropeScale != MAX_ROPE_SCALE) {
+    } else if (phases[3] && trolleyX != MAX_TROLLEY_X) {
 
-        modifyRopeScale(ropeScale + 2 * delta);
+        modifyTrolleyX(trolleyX + 16 * delta);
+        modifyTrolleyX(Math.min(trolleyX, MAX_TROLLEY_X));
+        trolley.position.x = trolleyX;
+
+    } else if (phases[3]) {
+        phases[3] = false;
+        phases[4] = true;
+    } else if (phases[4] && ropeScale != MAX_ROPE_SCALE) {
+
+        modifyRopeScale(ropeScale + 4 * delta);
         modifyRopeScale(Math.min(ropeScale, MAX_ROPE_SCALE));
         let hRope = BASE_H_ROPE * ropeScale;
         let rope = trolley.getObjectByName("rope");
@@ -158,29 +172,25 @@ function animationUpdate() {
             DIMENSIONS.hClawBase / 2
         );
 
-        modifyClawY(clawY - 10 * delta);
+        modifyClawY(clawY - 20 * delta);
         modifyClawY(Math.max(clawY, MIN_CLAW_Y));
         claw.position.y = clawY;
 
-    } else if (phases[3]) {
-        phases[3] = false
+    } else if (phases[4]) {
+        phases[4] = false;
     } else {
         updateIsAnimating(false);
         if (crateMesh) {
             claw.remove(crateMesh);
             crateMesh = undefined;
         }
-        phases = Array(4).fill(false);
+        phases = Array(ANIMATION_PHASES).fill(false);
         phases[0] = true;
     }
 }
 
 function standardUpdate() {
     "use strict";
-    keyUpdate();
-    updateClawCamera();
-    updateHUD();
-
     modifyTrolleyX(Math.min(trolleyX, MAX_TROLLEY_X));
     modifyTrolleyX(Math.max(trolleyX, MIN_TROLLEY_X));
     trolley.position.x = trolleyX;
