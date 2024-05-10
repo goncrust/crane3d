@@ -26,13 +26,13 @@ function createCrates() {
 
     crates.push(new THREE.Object3D());
     pos = new THREE.Vector3(10, 0, -20);
-    dim = new THREE.Vector2(4,0)
+    dim = new THREE.Vector2(4, 0);
     rot = 0;
     addCrate(crates[1], pos, dim, rot, MATERIALS.red, "D");
 
     crates.push(new THREE.Object3D());
     pos = new THREE.Vector3(10, 0, 0);
-    dim = new THREE.Vector2(3,0)
+    dim = new THREE.Vector2(3, 0);
     rot = 0;
     addCrate(crates[2], pos, dim, rot, MATERIALS.darkOrange, "I");
 
@@ -72,21 +72,28 @@ function addCrate(obj, pos, dim, rot, color, shape) {
             break;
         case "T":
             geometry = new THREE.TorusGeometry(dim.x, dim.y, dim.z, dim.w);
-            mesh = new THREE.Mesh(geometry, color)
+            mesh = new THREE.Mesh(geometry, color);
             mesh.rotation.y = rot;
-            mesh.position.set(pos.x, pos.y+dim.x, pos.z);
+            mesh.position.set(pos.x, pos.y + dim.x, pos.z);
             break;
         case "TK":
-            geometry = new THREE.TorusKnotGeometry(dim.x, dim.y, dim.z, dim.w, 9, 18);
-            mesh = new THREE.Mesh(geometry, color)
+            geometry = new THREE.TorusKnotGeometry(
+                dim.x,
+                dim.y,
+                dim.z,
+                dim.w,
+                9,
+                18,
+            );
+            mesh = new THREE.Mesh(geometry, color);
             mesh.rotation.y = rot;
-            mesh.position.set(pos.x, pos.y+dim.x, pos.z);
+            mesh.position.set(pos.x, pos.y + dim.x, pos.z);
             break;
         default:
             geometry = new THREE.BoxGeometry(dim.x, dim.y, dim.z);
             mesh = new THREE.Mesh(geometry, color);
             mesh.rotation.y = rot;
-            mesh.position.set(pos.x, pos.y + dim.y/2 , pos.z);
+            mesh.position.set(pos.x, pos.y + dim.y / 2, pos.z);
             break;
     }
     obj.add(mesh);
@@ -103,23 +110,23 @@ function createContainer() {
     let posZ = 0;
 
     // X Walls
-    let pos = new THREE.Vector3(0, 0, -cContainer/2);
+    let pos = new THREE.Vector3(0, 0, -cContainer / 2);
     let dim = new THREE.Vector3(lContainer, hContainer, thickness);
     let rot = 0;
     addWall(container, pos, dim, rot, MATERIALS.coffeeBrown);
 
-    pos = new THREE.Vector3(0, 0, cContainer/2);
+    pos = new THREE.Vector3(0, 0, cContainer / 2);
     dim = new THREE.Vector3(lContainer, hContainer, thickness);
     rot = 0;
     addWall(container, pos, dim, rot, MATERIALS.coffeeBrown);
 
     // Z Walls
-    pos = new THREE.Vector3(-0.5+lContainer/2, 0, 0);
+    pos = new THREE.Vector3(-0.5 + lContainer / 2, 0, 0);
     dim = new THREE.Vector3(cContainer, hContainer, thickness);
     rot = Math.PI / 2;
     addWall(container, pos, dim, rot, MATERIALS.coffeeBrown);
 
-    pos = new THREE.Vector3(0.5-lContainer/2, 0, 0);
+    pos = new THREE.Vector3(0.5 - lContainer / 2, 0, 0);
     dim = new THREE.Vector3(cContainer, hContainer, thickness);
     rot = Math.PI / 2;
     addWall(container, pos, dim, rot, MATERIALS.coffeeBrown);

@@ -55,9 +55,9 @@ import {
     checkCollisions,
     isAnimating,
     updateIsAnimating,
-    colidedCrate,
-    updateColidedCrate,
-} from "./colisions.js";
+    collidedCrate,
+    updateCollidedCrate,
+} from "./collisions.js";
 export { scene };
 
 //////////////////////
@@ -117,10 +117,10 @@ function animationUpdate() {
         phases[0] = false;
         phases[1] = true;
     } else if (phases[1] && ropeScale != MIN_ROPE_SCALE) {
-        if (colidedCrate > -1) {
-            const crate = crates[colidedCrate];
-            removeCrate(colidedCrate);
-            updateColidedCrate(-1);
+        if (collidedCrate > -1) {
+            const crate = crates[collidedCrate];
+            removeCrate(collidedCrate);
+            updateCollidedCrate(-1);
 
             crateMesh = crate.children[0];
             scene.remove(crate);
