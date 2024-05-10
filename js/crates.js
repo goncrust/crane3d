@@ -26,53 +26,66 @@ function createCrates() {
     pos = new THREE.Vector3(10, 0, -20);
     dim = new THREE.Vector2(4,0)
     rot = 0;
-    addCrate(crates[1], pos, dim, rot, MATERIALS.red, "Dodecahedron");
+    addCrate(crates[1], pos, dim, rot, MATERIALS.red, "D");
 
     crates.push(new THREE.Object3D());
     pos = new THREE.Vector3(10, 0, 0);
     dim = new THREE.Vector2(3,0)
     rot = 0;
-    addCrate(crates[2], pos, dim, rot, MATERIALS.darkOrange, "Icosahedron");
+    addCrate(crates[2], pos, dim, rot, MATERIALS.darkOrange, "I");
 
     crates.push(new THREE.Object3D());
     pos = new THREE.Vector3(20, 0, 0);
-    dim = new THREE.Vector2(2,2)
+    dim = new THREE.Vector4(2, 0.4, 20, 30);
     rot = 0;
-    addCrate(crates[3], pos, dim, rot, MATERIALS.coffeeBrown, "Torus");
+    addCrate(crates[3], pos, dim, rot, MATERIALS.pink, "T");
+
+    crates.push(new THREE.Object3D());
+    pos = new THREE.Vector3(-10, 0, -20);
+    dim = new THREE.Vector4(2, 0.3, 20, 30);
+    rot = 0;
+    addCrate(crates[4], pos, dim, rot, MATERIALS.red, "TK");
 
     scene.add(crates[0]);
     scene.add(crates[1]);
     scene.add(crates[2]);
     scene.add(crates[3]);
+    scene.add(crates[4]);
 }
 
 function addCrate(obj, pos, dim, rot, color, shape) {
     "use strict";
 
     switch (shape) {
-        case "Dodecahedron":
+        case "D":
             geometry = new THREE.DodecahedronGeometry(dim.x, dim.y);
             mesh = new THREE.Mesh(geometry, color);
             mesh.rotation.y = rot;
             mesh.position.set(pos.x, pos.y + dim.x, pos.z);
             break;
-        case "Icosahedron":
+        case "I":
             geometry = new THREE.IcosahedronGeometry(dim.x, dim.y);
             mesh = new THREE.Mesh(geometry, color);
             mesh.rotation.y = rot;
             mesh.position.set(pos.x, pos.y + dim.x, pos.z);
             break;
-        case "Torus":
-            geometry = new THREE.TorusGeometry(2,0.4,5,6,Math.PI/2);
-            mesh = new THREE.Mesh(geometry, color);
+        case "T":
+            geometry = new THREE.TorusGeometry(dim.x, dim.y, dim.z, dim.w); 
+            mesh = new THREE.Mesh(geometry, color)
             mesh.rotation.y = rot;
-            mesh.position.set(pos.x, pos.y, pos.z);
-        case "Torus Knot":
+            mesh.position.set(pos.x, pos.y+dim.x, pos.z);
+            break;
+        case "TK":
+            geometry = new THREE.TorusKnotGeometry(dim.x, dim.y, dim.z, dim.w, 9, 18); 
+            mesh = new THREE.Mesh(geometry, color)
+            mesh.rotation.y = rot;
+            mesh.position.set(pos.x, pos.y+dim.x, pos.z);
+            break;
         default:
             geometry = new THREE.BoxGeometry(dim.x, dim.y, dim.z);
             mesh = new THREE.Mesh(geometry, color);
             mesh.rotation.y = rot;
-            mesh.position.set(pos.x, pos.y + dim.y / 2, pos.z);
+            mesh.position.set(pos.x, pos.y + dim.y/2 , pos.z);
             break;
     }
     
