@@ -11,10 +11,6 @@ export {
     fingerAngle,
     trolley,
     upperCrane,
-    trolleyMixer,
-    clawFingerMixers,
-    upperCraneMixer,
-    clawBoundingBox,
 };
 
 let crane, lowerCrane, upperCrane, trolley, claw;
@@ -22,12 +18,6 @@ let crane, lowerCrane, upperCrane, trolley, claw;
 let geometry, mesh;
 
 let ropeScale, trolleyX, towerAngle, clawY, fingerAngle;
-
-let clawBoundingBox;
-
-let trolleyMixer,
-    clawFingerMixers = [],
-    upperCraneMixer;
 
 export function modifyRopeScale(x) {
     ropeScale = x;
@@ -87,8 +77,6 @@ function createLowerCrane(x, y, z) {
 
     lowerCrane = new THREE.Object3D();
 
-    //lowerCrane.add(new THREE.AxesHelper(10));
-
     addBase(lowerCrane, 0, DIMENSIONS.hBase / 2, 0);
     addTower(lowerCrane, 0, DIMENSIONS.hTower / 2 + DIMENSIONS.hBase, 0);
 
@@ -126,8 +114,6 @@ function createUpperCrane(x, y, z) {
     upperCrane = new THREE.Object3D();
 
     // Referencial Filho: Eixo Rotatório
-    //upperCrane.add(new THREE.AxesHelper(10));
-
     // Posições relativas ao novo referencial
     addSuperiorTowerPeak(
         upperCrane,
@@ -189,7 +175,6 @@ function createUpperCrane(x, y, z) {
     );
 
     upperCrane.position.set(x, y, z);
-    upperCraneMixer = new THREE.AnimationMixer(upperCrane);
 }
 
 function addFrontPendant(obj, x, y, z, direction) {
@@ -304,9 +289,8 @@ function createTrolley(x, y, z) {
     "use strict";
 
     trolley = new THREE.Object3D();
-    // Referencial Neto: Carrinho
-    //trolley.add(new THREE.AxesHelper(10));
 
+    // Referencial Neto: Carrinho
     // Posições relativas ao novo referencial
     addTrolley(trolley, 0, -DIMENSIONS.hTrolley / 2, 0);
     addRope(trolley, 0, -(DIMENSIONS.hTrolley + DIMENSIONS.hRope / 2), 0);
@@ -318,7 +302,6 @@ function createTrolley(x, y, z) {
     );
 
     trolley.position.set(x, y, z);
-    trolleyMixer = new THREE.AnimationMixer(trolley);
 }
 
 function addTrolley(obj, x, y, z) {
@@ -364,15 +347,11 @@ function createClaw(x, y, z) {
 
     claw = new THREE.Object3D();
     // Referencial Bisneto: Pinças da garra
-    //claw.add(new THREE.AxesHelper(10));
     // Posições relativas ao novo referencial
     addClawFinger(claw, 0, 0, 0, 0);
     addClawFinger(claw, 0, 0, 0, Math.PI);
     addClawFinger(claw, 0, 0, 0, Math.PI / 2);
     addClawFinger(claw, 0, 0, 0, -Math.PI / 2);
-
-    clawBoundingBox = new THREE.Box3();
-    clawBoundingBox.setFromObject(claw, true);
 
     claw.position.set(x, y, z);
 }
@@ -453,8 +432,6 @@ function addClawFinger(obj, x, y, z, rot) {
 
     mesh = new THREE.Mesh(geometry, MATERIALS.pink);
     mesh.position.set(x, y, z);
-
-    clawFingerMixers.push(new THREE.AnimationMixer(mesh));
 
     obj.add(mesh);
 }

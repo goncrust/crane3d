@@ -15,11 +15,8 @@ import {
     trolley,
     upperCrane,
     ropeScale,
-    trolleyMixer,
-    clawFingerMixers,
-    upperCraneMixer,
 } from "./crane.js";
-import { createContainer, createCrates } from "./crates.js";
+import { createContainer, createCrates, removeCrate, crates } from "./crates.js";
 import { bindEvents, pressedKeys } from "./events.js";
 import { createHud } from "./hud.js";
 import {
@@ -48,14 +45,19 @@ import {
     broadPCamera,
     broadOCamera,
 } from "./cameras.js";
-import { checkCollisions, isAnimating } from "./colisions.js";
+import { checkCollisions, isAnimating, updateIsAnimating, colidedCrate, updateColidedCrate } from "./colisions.js";
 export { scene };
 
 //////////////////////
 /* GLOBAL VARIABLES */
 //////////////////////
+let crateMesh;
 let scene, renderer;
 let currCamera;
+
+let phases = Array(4).fill(false);
+phases[0] = true;
+
 const clock = new THREE.Clock();
 
 /////////////////////
@@ -77,6 +79,103 @@ function createScene() {
 /* UPDATE */
 ////////////
 function update() {
+    if (isAnimating) {
+        animationUpdate();
+    } else {
+        standardUpdate();
+    }
+}
+
+function animationUpdate() {
+    const delta = clock.getDelta();
+
+    if (phases[0] && fingerAngle != MAX_FINGER_ANGLE) {
+
+        modifyFingerAngle(fingerAngle + 2 * delta);
+        modifyFingerAngle(Math.min(fingerAngle, MAX_FINGER_ANGLE));
+
+        claw.children[0].setRotationFromAxisAngle(Z_AXIS, fingerAngle);
+        claw.children[1].setRotationFromAxisAngle(Z_AXIS, -fingerAngle);
+        claw.children[2].setRotationFromAxisAngle(X_AXIS, fingerAngle);
+        claw.children[3].setRotationFromAxisAngle(X_AXIS, -fingerAngle);
+
+    } else if (phases[0]) {
+        phases[0] = false;
+        phases[1] = true;
+    } else if (phases[1] && ropeScale != MIN_ROPE_SCALE) {
+
+        if (colidedCrate > -1) {
+            const crate = crates[colidedCrate];
+            removeCrate(colidedCrate);
+            updateColidedCrate(-1);
+
+            crateMesh = crate.children[0];
+            scene.remove(crate);
+
+            crateMesh.position.set(0, -1 -crate.height/2, 0);
+            claw.add(crateMesh);
+        }
+
+        modifyRopeScale(ropeScale - 2 * delta);
+        modifyRopeScale(Math.max(ropeScale, MIN_ROPE_SCALE));
+        let hRope = BASE_H_ROPE * ropeScale;
+        let rope = trolley.getObjectByName("rope");
+        rope.scale.y = ropeScale;
+        rope.position.y = -(DIMENSIONS.hTrolley + hRope / 2);
+        trolley.getObjectByName("clawBase").position.y = -(
+            DIMENSIONS.hTrolley +
+            hRope +
+            DIMENSIONS.hClawBase / 2
+        );
+
+        modifyClawY(clawY + 10 * delta);
+        modifyClawY(Math.min(clawY, MAX_CLAW_Y));
+        claw.position.y = clawY;
+
+    } else if (phases[1]) {
+        phases[1] = false;
+        phases[2] = true;
+    } else if (phases[2] && towerAngle != MAX_TOWER_ANGLE) {
+
+        modifyTowerAngle(towerAngle + 2 * delta);
+        modifyTowerAngle(Math.min(towerAngle, MAX_TOWER_ANGLE));
+        upperCrane.setRotationFromAxisAngle(Y_AXIS, towerAngle);
+
+    } else if (phases[2]) {
+        phases[2] = false;
+        phases[3] = true;
+    } else if (phases[3] && ropeScale != MAX_ROPE_SCALE) {
+
+        modifyRopeScale(ropeScale + 2 * delta);
+        modifyRopeScale(Math.min(ropeScale, MAX_ROPE_SCALE));
+        let hRope = BASE_H_ROPE * ropeScale;
+        let rope = trolley.getObjectByName("rope");
+        rope.scale.y = ropeScale;
+        rope.position.y = -(DIMENSIONS.hTrolley + hRope / 2);
+        trolley.getObjectByName("clawBase").position.y = -(
+            DIMENSIONS.hTrolley +
+            hRope +
+            DIMENSIONS.hClawBase / 2
+        );
+
+        modifyClawY(clawY - 10 * delta);
+        modifyClawY(Math.max(clawY, MIN_CLAW_Y));
+        claw.position.y = clawY;
+
+    } else if (phases[3]) {
+        phases[3] = false
+    } else {
+        updateIsAnimating(false);
+        if (crateMesh) {
+            claw.remove(crateMesh);
+            crateMesh = undefined;
+        }
+        phases = Array(4).fill(false);
+        phases[0] = true;
+    }
+}
+
+function standardUpdate() {
     "use strict";
     keyUpdate();
     updateClawCamera();
@@ -112,13 +211,6 @@ function update() {
     claw.children[1].setRotationFromAxisAngle(Z_AXIS, -fingerAngle);
     claw.children[2].setRotationFromAxisAngle(X_AXIS, fingerAngle);
     claw.children[3].setRotationFromAxisAngle(X_AXIS, -fingerAngle);
-
-    const delta = clock.getDelta();
-    for (const mixer of clawFingerMixers) {
-        mixer.update(delta);
-    }
-    trolleyMixer.update(delta);
-    upperCraneMixer.update(delta);
 
     checkCollisions();
 }

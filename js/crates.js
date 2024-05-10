@@ -1,14 +1,16 @@
 import * as THREE from "three";
 import { MATERIALS } from "./constants.js";
 import { scene } from "./main-script.js";
-export { createContainer, createCrates, crateBounds, crates };
+export { createContainer, createCrates, removeCrate, crates };
 
 let geometry, mesh;
 
 let crates = [],
     container;
 
-let crateBounds = [];
+function removeCrate(i) {
+    crates.splice(i, 1);
+}
 
 ////////////////////////
 /* CREATE OBJECT3D(S) */
@@ -38,14 +40,7 @@ function addCrate(obj, pos, dim, rot, color) {
     mesh = new THREE.Mesh(geometry, color);
     mesh.rotation.y = rot;
     mesh.position.set(pos.x, pos.y + dim.y / 2, pos.z);
-    mesh.geometry.computeBoundingBox();
     obj.add(mesh);
-
-    let crateBoundingSphere = new THREE.Sphere();
-    const crateBoundingBox = new THREE.Box3();
-    crateBoundingBox.setFromObject(mesh, true);
-    crateBoundingBox.getBoundingSphere(crateBoundingSphere);
-    crateBounds.push({ box: crateBoundingBox, sphere: crateBoundingSphere });
 }
 
 function createContainer() {

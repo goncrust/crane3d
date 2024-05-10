@@ -22,22 +22,8 @@ let pressedKeys = {
 /*        EVENTS          */
 ////////////////////////////
 function bindEvents() {
-    window.addEventListener("resize", onResize);
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
-}
-
-////////////////////////////
-/* RESIZE WINDOW CALLBACK */
-////////////////////////////
-function onResize() {
-    "use strict";
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    if (window.innerHeight > 0 && window.innerWidth > 0) {
-        currCamera.aspect = window.innerWidth / window.innerHeight;
-        currCamera.updateProjectionMatrix();
-    }
 }
 
 ///////////////////////
