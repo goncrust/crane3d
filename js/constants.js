@@ -149,7 +149,8 @@ const BIND_INFORMATION = [
 
 const MAX_TROLLEY_X =
     DIMENSIONS.cJib + DIMENSIONS.lTower / 2 - DIMENSIONS.cTrolley / 2;
-const MIN_TROLLEY_X = DIMENSIONS.lTower / 2 + DIMENSIONS.cTrolley / 2;
+const MIN_TROLLEY_X =
+    DIMENSIONS.lTower / 2 + DIMENSIONS.lBase / 2 + DIMENSIONS.lClawBase / 1.5;
 
 const MIN_ROPE_SCALE = 0;
 const MAX_ROPE_SCALE =

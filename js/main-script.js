@@ -16,7 +16,12 @@ import {
     upperCrane,
     ropeScale,
 } from "./crane.js";
-import { createContainer, createCrates, removeCrate, crates } from "./crates.js";
+import {
+    createContainer,
+    createCrates,
+    removeCrate,
+    crates,
+} from "./crates.js";
 import { bindEvents, pressedKeys } from "./events.js";
 import { createHud } from "./hud.js";
 import {
@@ -46,7 +51,13 @@ import {
     broadPCamera,
     broadOCamera,
 } from "./cameras.js";
-import { checkCollisions, isAnimating, updateIsAnimating, colidedCrate, updateColidedCrate } from "./colisions.js";
+import {
+    checkCollisions,
+    isAnimating,
+    updateIsAnimating,
+    colidedCrate,
+    updateColidedCrate,
+} from "./colisions.js";
 export { scene };
 
 //////////////////////
@@ -82,8 +93,8 @@ function createScene() {
 ////////////
 function update() {
     keyUpdate();
-    updateClawCamera();
     updateHUD();
+    updateClawCamera();
     delta = clock.getDelta();
 
     if (isAnimating) {
@@ -95,7 +106,6 @@ function update() {
 
 function animationUpdate() {
     if (phases[0] && fingerAngle != MAX_FINGER_ANGLE) {
-
         modifyFingerAngle(fingerAngle + 2 * delta);
         modifyFingerAngle(Math.min(fingerAngle, MAX_FINGER_ANGLE));
 
@@ -103,12 +113,10 @@ function animationUpdate() {
         claw.children[1].setRotationFromAxisAngle(Z_AXIS, -fingerAngle);
         claw.children[2].setRotationFromAxisAngle(X_AXIS, fingerAngle);
         claw.children[3].setRotationFromAxisAngle(X_AXIS, -fingerAngle);
-
     } else if (phases[0]) {
         phases[0] = false;
         phases[1] = true;
     } else if (phases[1] && ropeScale != MIN_ROPE_SCALE) {
-
         if (colidedCrate > -1) {
             const crate = crates[colidedCrate];
             removeCrate(colidedCrate);
@@ -117,7 +125,7 @@ function animationUpdate() {
             crateMesh = crate.children[0];
             scene.remove(crate);
 
-            crateMesh.position.set(0, -1 -crate.height/2, 0);
+            crateMesh.position.set(0, -1 - crate.height / 2, 0);
             claw.add(crateMesh);
         }
 
@@ -136,30 +144,24 @@ function animationUpdate() {
         modifyClawY(clawY + 20 * delta);
         modifyClawY(Math.min(clawY, MAX_CLAW_Y));
         claw.position.y = clawY;
-
     } else if (phases[1]) {
         phases[1] = false;
         phases[2] = true;
     } else if (phases[2] && towerAngle != MAX_TOWER_ANGLE) {
-
         modifyTowerAngle(towerAngle + 2 * delta);
         modifyTowerAngle(Math.min(towerAngle, MAX_TOWER_ANGLE));
         upperCrane.setRotationFromAxisAngle(Y_AXIS, towerAngle);
-
     } else if (phases[2]) {
         phases[2] = false;
         phases[3] = true;
     } else if (phases[3] && trolleyX != MAX_TROLLEY_X) {
-
         modifyTrolleyX(trolleyX + 16 * delta);
         modifyTrolleyX(Math.min(trolleyX, MAX_TROLLEY_X));
         trolley.position.x = trolleyX;
-
     } else if (phases[3]) {
         phases[3] = false;
         phases[4] = true;
     } else if (phases[4] && ropeScale != MAX_ROPE_SCALE) {
-
         modifyRopeScale(ropeScale + 4 * delta);
         modifyRopeScale(Math.min(ropeScale, MAX_ROPE_SCALE));
         let hRope = BASE_H_ROPE * ropeScale;
@@ -175,7 +177,6 @@ function animationUpdate() {
         modifyClawY(clawY - 20 * delta);
         modifyClawY(Math.max(clawY, MIN_CLAW_Y));
         claw.position.y = clawY;
-
     } else if (phases[4]) {
         phases[4] = false;
     } else {
@@ -226,6 +227,8 @@ function standardUpdate() {
 }
 
 function keyUpdate() {
+    if (isAnimating) return;
+
     let scaler = 0.3;
     for (const key in pressedKeys) {
         if (pressedKeys[key]) {
@@ -262,38 +265,30 @@ function keyUpdate() {
                     pressedKeys[key] = false;
                     break;
                 case "q":
-                    if (!isAnimating)
-                        modifyTowerAngle(towerAngle + scaler * 0.1);
+                    modifyTowerAngle(towerAngle + scaler * 0.1);
                     break;
                 case "a":
-                    if (!isAnimating)
-                        modifyTowerAngle(towerAngle - scaler * 0.1);
+                    modifyTowerAngle(towerAngle - scaler * 0.1);
                     break;
                 case "w":
-                    if (!isAnimating) modifyTrolleyX(trolleyX + scaler * 1);
+                    modifyTrolleyX(trolleyX + scaler * 1);
                     break;
                 case "s":
-                    if (!isAnimating) modifyTrolleyX(trolleyX - scaler * 1);
+                    modifyTrolleyX(trolleyX - scaler * 1);
                     break;
                 case "e":
-                    if (!isAnimating) {
-                        modifyRopeScale(ropeScale - scaler * 0.2);
-                        modifyClawY(clawY + scaler * 1);
-                    }
+                    modifyRopeScale(ropeScale - scaler * 0.2);
+                    modifyClawY(clawY + scaler * 1);
                     break;
                 case "d":
-                    if (!isAnimating) {
-                        modifyRopeScale(ropeScale + scaler * 0.2);
-                        modifyClawY(clawY - scaler * 1);
-                    }
+                    modifyRopeScale(ropeScale + scaler * 0.2);
+                    modifyClawY(clawY - scaler * 1);
                     break;
                 case "r":
-                    if (!isAnimating)
-                        modifyFingerAngle(fingerAngle + scaler * 0.1);
+                    modifyFingerAngle(fingerAngle + scaler * 0.1);
                     break;
                 case "f":
-                    if (!isAnimating)
-                        modifyFingerAngle(fingerAngle - scaler * 0.1);
+                    modifyFingerAngle(fingerAngle - scaler * 0.1);
                     break;
             }
         }
@@ -375,8 +370,12 @@ function init() {
 /////////////////////
 function animate() {
     "use strict";
+    // update
     update();
+
+    // render
     render();
+
     requestAnimationFrame(animate);
 }
 
